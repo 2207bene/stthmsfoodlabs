@@ -80,7 +80,7 @@ export async function getCampflowSummary(): Promise<{
   })
 
   const total = persons.length
-  const veggie = persons.filter(p => {
+  const veggie = persons.filter((p: { diet: string; intolerances: string; importedAt: Date }) => {
     const diets = p.diet.split(",").map(d => d.trim())
     return diets.includes("vegetarian") || diets.includes("vegan")
   }).length
