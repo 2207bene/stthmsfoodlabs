@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model PersonGroup {
+  id           String   @id @default(cuid())
+  name         String
+  count        Int
+  ageRange     String   // "kind", "jugend", "erwachsen"
+  gender       String   // "m", "f", "diverse"
+  isVegetarian Boolean  @default(false)
+  intolerances String   // comma-separated: "gluten,laktose"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  tags        String   // comma-separated
+  cookingTime Int?     // in minutes
+  notes       String?
+  allergens   String   // comma-separated
+  personCount Int?     // defaults to group calc
+
+  versions    RecipeVersion[]
+  mealPlans   MealPlanEntry[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model RecipeVersion {
+  id          String   @id @default(cuid())
+  recipeId    String
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  type        String   // "MIT_FLEISCH" | "VEGETARISCH"
+
+  ingredients RecipeIngredient[]
+
+  @@unique([recipeId, type])
+}
+
+model RecipeIngredient {
+  id              String   @id @default(cuid())
+  recipeVersionId String
+  recipeVersion   RecipeVersion @relation(fields: [recipeVersionId], references: [id], onDelete: Cascade)
+  ingredientId    String
+  ingredient      Ingredient    @relation(fields: [ingredientId], references: [id])
+  amountPerPerson Float
+  unit            String
+}
+
+model Ingredient {
+  id             String   @id @default(cuid())
+  name           String
+  unit           String
+  category       String
+  allergens      String   // comma-separated
+  currentStock   Float    @default(0)
+  metroUrl       String?
+
+  recipeIngredients RecipeIngredient[]
+  stockMovements    StockMovement[]
+  shoppingItems     ShoppingListItem[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model MealPlanEntry {
+  id                String   @id @default(cuid())
+  date              DateTime
+  mealTime          String   // "fruehstueck", "mittag", "nachmittag", "abend", "special"
+  
+  recipeId          String?
+  recipe            Recipe?  @relation(fields: [recipeId], references: [id])
+  
+  specialName       String?
+  specialTime       String?
+  sortOrder         Int      @default(0)
+  
+  personCountMeat   Int?
+  personCountVeggie Int?
+  
+  status            String   // "leer", "geplant", "vorbereitet", "gekocht"
+  notes             String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model StockMovement {
+  id           String   @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  
+  amount       Float
+  direction    Int      // 1 for IN, -1 for OUT
+  type         String   // "einkauf", "verbrauch", "korrektur", "gericht_gebucht"
+  
+  referenceId  String?  // z.B. MealPlanEntry ID
+  userId       String?
+  notes        String?
+  
+  createdAt    DateTime @default(now())
+}
+
+model ShoppingList {
+  id            String   @id @default(cuid())
+  generatedFrom String   // comma-sep MealPlanEntry IDs
+  status        String   // "offen", "in_bearbeitung", "abgeschlossen"
+  type          String   // "metro", "vor_ort", "sonstiges"
+  
+  items         ShoppingListItem[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CampflowPerson {
+  id            String   @id @default(cuid())
+  campflowId    String   @unique
+  listId        String
+  firstName     String?
+  lastName      String?
+  birthdate     String?
+  gender        String?
+  diet          String   @default("")
+  intolerances  String   @default("")
+  importedAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ShoppingListItem {
+  id             String       @id @default(cuid())
+  shoppingListId String
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  
+  ingredientId   String
+  ingredient     Ingredient   @relation(fields: [ingredientId], references: [id])
+  
+  amountTotal    Float
+  amountObtained Float        @default(0)
+  checked        Boolean      @default(false)
+  notes          String?
+}

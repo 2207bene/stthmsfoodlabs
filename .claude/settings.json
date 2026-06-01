@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sqlite3 prisma/dev.db \".tables\")",
+      "Bash(sqlite3 prisma/dev.db \"SELECT * FROM Recipe LIMIT 5;\")",
+      "Bash(sqlite3 prisma/dev.db \"SELECT * FROM Ingredient LIMIT 10;\")",
+      "Bash(sqlite3 prisma/dev.db \"SELECT * FROM RecipeVersion;\")",
+      "Bash(sqlite3 prisma/dev.db \"SELECT * FROM MealPlanEntry LIMIT 10;\")",
+      "Bash(node -e \"console.log\\(new Date\\(1777845600000\\).toISOString\\(\\)\\); console.log\\(new Date\\('2025-08-02'\\).getTime\\(\\)\\); console.log\\(new Date\\('2025-08-02T00:00:00.000Z'\\).getTime\\(\\)\\)\")",
+      "Bash(sqlite3 prisma/dev.db \"SELECT COUNT\\(*\\) FROM Recipe; SELECT COUNT\\(*\\) FROM RecipeIngredient; SELECT COUNT\\(*\\) FROM Ingredient;\")",
+      "Bash(node --input-type=module -e \"import { PrismaClient } from './node_modules/.prisma/client/index.js'; console.log\\('ok'\\)\")",
+      "Bash(node packages/database/seed.mjs)",
+      "Bash(sqlite3 prisma/dev.db ' *)",
+      "Bash(npx tsc *)",
+      "Read(//Users/benediktortgiese/Documents/Claude/Projects/Küche\\\\ 26/apps/web/src/app/recipes/[id]/**)",
+      "Read(//Users/benediktortgiese/Documents/Claude/Projects/Küche\\\\ 26/apps/web/src/app/shopping-list/new/**)",
+      "Read(//Users/benediktortgiese/Documents/Claude/Projects/Küche\\\\ 26/apps/web/src/app/shopping-list/\\\\[id\\\\]/**)",
+      "Bash(npx next *)",
+      "Bash(npx prisma *)",
+      "Bash(sqlite3 \"/Users/benediktortgiese/Documents/Claude/Projects/Küche 26/packages/database/prisma/dev.db\" \"PRAGMA table_info\\(ShoppingListItem\\);\")",
+      "Bash(npm run *)"
+    ],
+    "additionalDirectories": [
+      "/Users/benediktortgiese/Documents/Claude/Projects/Küche 26/apps/web/.next"
+    ]
+  }
+}
