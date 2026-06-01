@@ -23,6 +23,8 @@ runConfig:
   # - variable: MY_SECRET
   #   secret: mySecretRef
 env:
+  - variable: DATABASE_URL
+    secret: DATABASE_URL
   - variable: ANTHROPIC_API_KEY
     secret: ANTHROPIC_API_KEY
   - variable: CAMPFLOW_API_TOKEN
@@ -31,3 +33,5 @@ env:
     secret: NEXT_PUBLIC_SUPABASE_ANON_KEY
   - variable: NEXT_PUBLIC_SUPABASE_URL
     secret: NEXT_PUBLIC_SUPABASE_URL
+  - variable: DATABASE_URL
+    secret: DATABASE_URL
