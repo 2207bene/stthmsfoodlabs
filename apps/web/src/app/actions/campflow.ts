@@ -88,7 +88,7 @@ export async function getCampflowSummary(): Promise<{
 
   const lastImport =
     persons.length > 0
-      ? persons.reduce<Date>((max, p) => (p.importedAt > max ? p.importedAt : max), persons[0].importedAt)
+      ? persons.reduce((max: Date, p: { diet: string; intolerances: string; importedAt: Date }) => (p.importedAt > max ? p.importedAt : max), persons[0].importedAt)
       : null
 
   const intoleranceCounts = new Map<string, number>()
