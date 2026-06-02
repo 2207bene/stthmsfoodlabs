@@ -33,5 +33,3 @@ env:
     secret: NEXT_PUBLIC_SUPABASE_ANON_KEY
   - variable: NEXT_PUBLIC_SUPABASE_URL
     secret: NEXT_PUBLIC_SUPABASE_URL
-  - variable: DATABASE_URL
-    secret: DATABASE_URL
