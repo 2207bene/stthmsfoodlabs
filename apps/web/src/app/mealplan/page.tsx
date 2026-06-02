@@ -16,7 +16,7 @@ export default async function MealPlanPage({
   // Calculate the start-of-week to display.
   // If a "week" param is provided (ISO date string of any day in that week), use it.
   // Otherwise fall back to Aug 1, 2026 (Saturday before KW32 2026).
-  const defaultDate = new Date("2026-08-01T00:00:00.000Z");
+  const defaultDate = new Date("2025-08-02T00:00:00.000Z");
   const baseDate = week ? new Date(week) : defaultDate;
   const startOfCurrentWeek = startOfWeek(baseDate, { weekStartsOn: 6 });
 

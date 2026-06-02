@@ -9,11 +9,12 @@ import { deleteRecipe } from "@/app/actions/recipes";
 import { AiCalculateButton } from "./AiCalculateButton";
 import { EditRecipeDialog } from "./EditRecipeDialog";
 import { IngredientsCard } from "./IngredientsCard";
+import { getPersonGroupCounts } from "@/app/actions/groups";
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const [recipe, groups] = await Promise.all([
+  const [recipe, groups, counts] = await Promise.all([
     prisma.recipe.findUnique({
       where: { id },
       include: {
@@ -30,6 +31,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
       orderBy: { createdAt: "asc" },
       select: { id: true, name: true, count: true, isVegetarian: true },
     }),
+    getPersonGroupCounts(),
   ]);
 
   if (!recipe) return notFound();
@@ -97,7 +99,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                     },
                   }))}
                   recipeId={recipe.id}
-                  groups={groups}
+                  defaultPersons={counts.meat}
                 />
               ) : (
                 <p className="text-sm text-gray-500 italic p-4">Keine Fleisch-Version vorhanden.</p>
@@ -121,7 +123,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                     },
                   }))}
                   recipeId={recipe.id}
-                  groups={groups}
+                  defaultPersons={counts.veggie}
                 />
               ) : (
                 <p className="text-sm text-gray-500 italic p-4">Keine Vegetarisch-Version vorhanden.</p>

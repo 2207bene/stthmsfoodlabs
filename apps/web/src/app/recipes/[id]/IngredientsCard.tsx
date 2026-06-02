@@ -37,19 +37,12 @@ interface RecipeIngredientRow {
   ingredient: Ingredient;
 }
 
-interface PersonGroup {
-  id: string;
-  name: string;
-  count: number;
-  isVegetarian: boolean;
-}
-
 interface IngredientsCardProps {
   versionId: string;
   versionType: "MIT_FLEISCH" | "VEGETARISCH";
   initialIngredients: RecipeIngredientRow[];
   recipeId: string;
-  groups: PersonGroup[];
+  defaultPersons: number;
 }
 
 const CATEGORIES = [
@@ -57,21 +50,28 @@ const CATEGORIES = [
   "Brot & Getreide", "Gewürze & Saucen", "Getränke", "Sonstiges",
 ];
 
+function formatAmount(amount: number, unit: string): string {
+  if (unit.toLowerCase() === "g" && amount >= 1000) {
+    return `${(amount / 1000).toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kg`;
+  }
+  if (unit.toLowerCase() === "ml" && amount >= 1000) {
+    return `${(amount / 1000).toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} l`;
+  }
+  return `${amount.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${unit}`;
+}
+
 export function IngredientsCard({
   versionId,
   versionType,
   initialIngredients,
   recipeId,
-  groups,
+  defaultPersons,
 }: IngredientsCardProps) {
   const [ingredients, setIngredients] = useState(initialIngredients);
   const [isPending, startTransition] = useTransition();
 
   // Persons adjustment
-  const defaultMeat = groups.filter(g => !g.isVegetarian).reduce((s, g) => s + g.count, 0);
-  const defaultVeggie = groups.filter(g => g.isVegetarian).reduce((s, g) => s + g.count, 0);
-  const relevantDefault = versionType === "MIT_FLEISCH" ? defaultMeat : defaultVeggie;
-  const [persons, setPersons] = useState(relevantDefault || 0);
+  const [persons, setPersons] = useState(defaultPersons || 0);
   const [buffer, setBuffer] = useState(0);
   const [showTotals, setShowTotals] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -250,9 +250,7 @@ export function IngredientsCard({
               </p>
               {ingredients.map(ing => {
                 const total = ing.amountPerPerson * totalPersons;
-                const displayTotal = total >= 1000
-                  ? `${(total / 1000).toFixed(2)} k${ing.unit}`
-                  : `${total.toFixed(0)} ${ing.unit}`;
+                const displayTotal = formatAmount(total, ing.unit);
                 return (
                   <div key={ing.id} className="text-xs flex justify-between text-gray-700">
                     <span>{ing.ingredient.name}</span>
@@ -281,20 +279,27 @@ export function IngredientsCard({
               >
                 <span className="text-sm">{ing.ingredient.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {ing.amountPerPerson} {ing.unit}
-                    <span className="text-xs text-gray-400 font-normal"> /Pers.</span>
+                  <span className="text-sm font-medium text-gray-700 flex flex-col items-end">
+                    <span>
+                      {ing.amountPerPerson} {ing.unit}
+                      <span className="text-xs text-gray-400 font-normal"> /Pers.</span>
+                    </span>
+                    {totalPersons > 0 && (
+                      <span className="text-xs text-indigo-600 font-normal bg-indigo-50 px-1.5 py-0.5 rounded mt-0.5">
+                        Gesamt: {formatAmount(ing.amountPerPerson * totalPersons, ing.unit)}
+                      </span>
+                    )}
                   </span>
                   <button
                     onClick={() => openEdit(ing)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-100 text-gray-500"
+                    className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-100 text-gray-500"
                     title="Bearbeiten"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleRemove(ing.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 text-red-400"
+                    className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 text-red-400"
                     title="Entfernen"
                     disabled={isPending}
                   >

@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DndContext, useDraggable, useDroppable, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragEndEvent,
+  useSensor,
+  useSensors,
+  MouseSensor,
+  TouchSensor,
+} from "@dnd-kit/core";
 import { assignRecipeToMealTime, removeMealPlanEntry, moveMealPlanEntry, updateMealPlanStatus } from "@/app/actions/mealplan";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
@@ -52,11 +61,15 @@ function DraggableRecipe({ recipe }: { recipe: Recipe }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className="flex items-center gap-2 p-3 bg-white border rounded-md shadow-sm cursor-grab hover:border-gray-400 z-10 relative"
+      className="flex items-center gap-2 p-3 bg-white border rounded-md shadow-sm hover:border-gray-400 z-10 relative"
     >
-      <GripVertical className="w-4 h-4 text-gray-400" />
+      <div
+        {...listeners}
+        {...attributes}
+        className="cursor-grab active:cursor-grabbing p-1 -m-1 text-gray-400 hover:text-gray-600 touch-none flex items-center justify-center"
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
       <div className="flex-1 overflow-hidden">
         <p className="text-sm font-medium truncate">{recipe.name}</p>
         <p className="text-xs text-gray-500">{recipe.category}</p>
@@ -91,14 +104,18 @@ function DraggableCalendarEntry({
     <div
       ref={setNodeRef}
       style={style}
-      {...(!isTemp ? listeners : {})}
-      {...(!isTemp ? attributes : {})}
-      className={`p-2 rounded-md border text-sm relative group ${color} ${!isTemp ? "cursor-grab active:cursor-grabbing" : ""}`}
+      className={`p-2 rounded-md border text-sm relative group ${color}`}
     >
       {!isTemp && (
-        <GripVertical className="absolute left-1.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-current opacity-40 group-hover:opacity-70" />
+        <div
+          {...listeners}
+          {...attributes}
+          className="absolute left-1 top-1/2 -translate-y-1/2 p-1.5 cursor-grab active:cursor-grabbing text-current opacity-40 hover:opacity-100 touch-none flex items-center justify-center"
+        >
+          <GripVertical className="w-3.5 h-3.5" />
+        </div>
       )}
-      <div className={`font-medium pr-6 truncate ${!isTemp ? "pl-4" : ""}`}>
+      <div className={`font-medium pr-6 truncate ${!isTemp ? "pl-5" : ""}`}>
         {entry.recipe?.name || "Unbekanntes Rezept"}
       </div>
       {!isTemp ? (
@@ -107,7 +124,7 @@ function DraggableCalendarEntry({
           onChange={(e) => onStatusChange(entry.id, e.target.value)}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
-          className={`mt-1 text-xs w-full bg-transparent border-none outline-none cursor-pointer opacity-70 hover:opacity-100 pl-4`}
+          className={`mt-1 text-xs w-full bg-transparent border-none outline-none cursor-pointer opacity-70 hover:opacity-100 pl-5`}
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -122,7 +139,7 @@ function DraggableCalendarEntry({
         <button
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
-          className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600"
+          className="absolute top-1.5 right-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity hover:text-red-600"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -159,21 +176,24 @@ function DroppableCell({
         isOver ? "bg-accent border-dashed border-accent-foreground border-2" : "bg-card"
       }`}
     >
-      {entries.length > 0 ? (
-        entries.map((entry) => (
-          <DraggableCalendarEntry
-            key={entry.id}
-            entry={entry}
-            color={color}
-            onDelete={onDelete}
-            onStatusChange={onStatusChange}
-          />
-        ))
-      ) : (
-        <div className="h-full flex items-center justify-center text-gray-300 text-xs text-center border-2 border-transparent border-dashed flex-1">
-          Drop Rezept hier
-        </div>
-      )}
+      {entries.map((entry) => (
+        <DraggableCalendarEntry
+          key={entry.id}
+          entry={entry}
+          color={color}
+          onDelete={onDelete}
+          onStatusChange={onStatusChange}
+        />
+      ))}
+      <div className={`flex items-center justify-center text-xs text-center border-2 border-dashed rounded transition-colors ${
+        entries.length === 0
+          ? "flex-1 border-transparent text-gray-300"
+          : isOver
+          ? "py-1 border-accent-foreground text-accent-foreground"
+          : "py-0.5 border-transparent text-gray-200 hover:border-gray-200 hover:text-gray-300"
+      }`}>
+        {entries.length === 0 ? "Drop Rezept hier" : isOver ? "+ hinzufügen" : "+"}
+      </div>
     </div>
   );
 }
@@ -191,6 +211,7 @@ export default function MealPlanCalendar({
 
   // Sync with server data after revalidatePath triggers an RSC re-render
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEntries(initialEntries);
   }, [initialEntries]);
 
@@ -236,8 +257,23 @@ export default function MealPlanCalendar({
     }
   };
 
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex-1 flex gap-6 overflow-hidden">
         {/* Calendar Grid */}
         <div className="flex-1 flex flex-col overflow-auto bg-card rounded-xl border border-border shadow-sm">

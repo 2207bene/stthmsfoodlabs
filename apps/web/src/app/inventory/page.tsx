@@ -192,14 +192,20 @@ export default async function InventoryPage() {
                   <Input id="name" name="name" required placeholder="z.B. Tomatenpassata" />
                 </div>
                 
-                <div className="space-y-2">
-                  <label htmlFor="unit" className="text-sm font-medium">Einheit</label>
-                  <select name="unit" id="unit" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" required>
-                    <option value="kg">Kilogramm (kg)</option>
-                    <option value="l">Liter (l)</option>
-                    <option value="pkg">Packungen (pkg)</option>
-                    <option value="pcs">Stück (pcs)</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label htmlFor="initialStock" className="text-sm font-medium">Anzahl / Menge</label>
+                    <Input id="initialStock" name="initialStock" type="number" step="any" min="0" defaultValue="0" placeholder="z.B. 20" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="unit" className="text-sm font-medium">Einheit</label>
+                    <select name="unit" id="unit" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" required>
+                      <option value="kg">Kilogramm (kg)</option>
+                      <option value="l">Liter (l)</option>
+                      <option value="pkg">Packungen (pkg)</option>
+                      <option value="pcs">Stück (pcs)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

@@ -36,10 +36,12 @@ interface PersonGroup {
 
 interface AiSuggestionSectionProps {
   groups: PersonGroup[];
+  defaultMeat: number;
+  defaultVeggie: number;
   onAccept: (suggestion: RecipeSuggestion) => void;
 }
 
-export function AiSuggestionSection({ groups, onAccept }: AiSuggestionSectionProps) {
+export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAccept }: AiSuggestionSectionProps) {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [suggestion, setSuggestion] = useState<Omit<RecipeSuggestion, "ingredients"> | null>(null);
@@ -48,10 +50,8 @@ export function AiSuggestionSection({ groups, onAccept }: AiSuggestionSectionPro
 
   // Step 2: persons dialog
   const [showPersonsStep, setShowPersonsStep] = useState(false);
-  const totalMeatFromGroups = groups.filter(g => !g.isVegetarian).reduce((s, g) => s + g.count, 0);
-  const totalVeggieFromGroups = groups.filter(g => g.isVegetarian).reduce((s, g) => s + g.count, 0);
-  const [personsMeat, setPersonsMeat] = useState(totalMeatFromGroups);
-  const [personsVeggie, setPersonsVeggie] = useState(totalVeggieFromGroups);
+  const [personsMeat, setPersonsMeat] = useState(defaultMeat);
+  const [personsVeggie, setPersonsVeggie] = useState(defaultVeggie);
   const [buffer, setBuffer] = useState(0);
 
   // Step 3: ingredient loading + result
@@ -84,8 +84,8 @@ export function AiSuggestionSection({ groups, onAccept }: AiSuggestionSectionPro
   };
 
   const handleOpenPersonsStep = () => {
-    setPersonsMeat(totalMeatFromGroups);
-    setPersonsVeggie(totalVeggieFromGroups);
+    setPersonsMeat(defaultMeat);
+    setPersonsVeggie(defaultVeggie);
     setBuffer(0);
     setSuggestedIngredients(null);
     setIngredientError(null);

@@ -22,9 +22,11 @@ interface PersonGroup {
 
 interface NewRecipeFormProps {
   groups: PersonGroup[];
+  defaultMeat: number;
+  defaultVeggie: number;
 }
 
-export function NewRecipeForm({ groups }: NewRecipeFormProps) {
+export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeFormProps) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Hauptgericht");
   const [tags, setTags] = useState("");
@@ -65,7 +67,12 @@ export function NewRecipeForm({ groups }: NewRecipeFormProps) {
         <p className="text-gray-500">Erstelle ein neues Gericht für den Speiseplan.</p>
       </div>
 
-      <AiSuggestionSection groups={groups} onAccept={handleAiAccept} />
+      <AiSuggestionSection
+        groups={groups}
+        defaultMeat={defaultMeat}
+        defaultVeggie={defaultVeggie}
+        onAccept={handleAiAccept}
+      />
 
       {suggestedIngredients && (
         <div className="rounded-xl border border-green-200 bg-green-50/60 p-4 mb-6 space-y-3">

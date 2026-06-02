@@ -21,19 +21,17 @@ export default async function RecipesPage() {
     }
   });
 
-  const assignedCategories = new Set<string>();
+  const assignedIds = new Set<string>();
   const sections = CATEGORY_SECTIONS.map(section => ({
     ...section,
     recipes: recipes.filter(r => {
       const match = section.categories.includes(r.category);
-      if (match) assignedCategories.add(r.id);
+      if (match) assignedIds.add(r.id);
       return match;
     })
   }));
 
-  // Catch-all for unknown categories
-  const uncategorized = recipes.filter(r => !assignedCategories.has(r.id));
-
+  const uncategorized = recipes.filter(r => !assignedIds.has(r.id));
   const allSections = uncategorized.length > 0
     ? [...sections, { label: "Sonstiges", categories: [], recipes: uncategorized }]
     : sections;

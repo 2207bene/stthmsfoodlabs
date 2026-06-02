@@ -10,20 +10,33 @@ export async function addIngredient(formData: FormData) {
   const name = formData.get("name") as string
   const unit = formData.get("unit") as string
   const category = formData.get("category") as string
+  const initialStock = parseFloat(formData.get("initialStock") as string) || 0
 
   if (!ALLOWED_UNITS.includes(unit)) {
     throw new Error(`Ungültige Einheit: ${unit}. Erlaubte Einheiten: ${ALLOWED_UNITS.join(", ")}`)
   }
 
-  await prisma.ingredient.create({
+  const ingredient = await prisma.ingredient.create({
     data: {
       name,
       unit,
       category,
       allergens: "",
-      currentStock: 0
+      currentStock: initialStock
     }
   })
+
+  if (initialStock > 0) {
+    await prisma.stockMovement.create({
+      data: {
+        ingredientId: ingredient.id,
+        amount: initialStock,
+        direction: 1,
+        type: "korrektur",
+        notes: "Anfangsbestand bei Erstellung"
+      }
+    })
+  }
 
   revalidatePath("/inventory")
 }
