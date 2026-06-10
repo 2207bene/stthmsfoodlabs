@@ -7,7 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowLeft, Drumstick, Salad } from "lucide-react";
-import { AiSuggestionSection, SuggestedIngredient } from "./AiSuggestionSection";
+import {
+  AiSuggestionSection,
+  SuggestedIngredient,
+} from "./AiSuggestionSection";
 import { createRecipe } from "@/app/actions/recipes";
 
 const SELECT_CLASS =
@@ -26,13 +29,18 @@ interface NewRecipeFormProps {
   defaultVeggie: number;
 }
 
-export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeFormProps) {
+export function NewRecipeForm({
+  groups,
+  defaultMeat,
+  defaultVeggie,
+}: NewRecipeFormProps) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Hauptgericht");
   const [tags, setTags] = useState("");
   const [allergens, setAllergens] = useState("");
   const [notes, setNotes] = useState("");
   const [hasVeggie, setHasVeggie] = useState(true);
+  const [isStandard, setIsStandard] = useState(false);
   const [suggestedIngredients, setSuggestedIngredients] = useState<{
     meat: SuggestedIngredient[];
     veggie: SuggestedIngredient[];
@@ -44,7 +52,10 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
     tags: string;
     allergens: string;
     notes: string;
-    ingredients?: { meat: SuggestedIngredient[]; veggie: SuggestedIngredient[] };
+    ingredients?: {
+      meat: SuggestedIngredient[];
+      veggie: SuggestedIngredient[];
+    };
   }) => {
     setName(suggestion.name);
     setCategory(suggestion.category);
@@ -59,12 +70,17 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
   return (
     <div className="p-4 md:p-8 max-w-2xl mx-auto font-sans">
       <div className="mb-6">
-        <Link href="/recipes" className="text-gray-500 hover:text-black flex items-center gap-2 mb-4 text-sm w-fit">
+        <Link
+          href="/recipes"
+          className="text-gray-500 hover:text-black flex items-center gap-2 mb-4 text-sm w-fit"
+        >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Übersicht
         </Link>
         <h1 className="text-3xl font-bold tracking-tight">Neues Rezept</h1>
-        <p className="text-gray-500">Erstelle ein neues Gericht für den Speiseplan.</p>
+        <p className="text-gray-500">
+          Erstelle ein neues Gericht für den Speiseplan.
+        </p>
       </div>
 
       <AiSuggestionSection
@@ -76,7 +92,9 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
 
       {suggestedIngredients && (
         <div className="rounded-xl border border-green-200 bg-green-50/60 p-4 mb-6 space-y-3">
-          <p className="text-sm font-semibold text-green-800">Zutaten werden beim Speichern angelegt:</p>
+          <p className="text-sm font-semibold text-green-800">
+            Zutaten werden beim Speichern angelegt:
+          </p>
 
           {suggestedIngredients.meat.length > 0 && (
             <div>
@@ -85,9 +103,14 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
               </p>
               <ul className="space-y-1">
                 {suggestedIngredients.meat.map((ing, i) => (
-                  <li key={i} className="text-sm flex justify-between text-gray-700">
+                  <li
+                    key={i}
+                    className="text-sm flex justify-between text-gray-700"
+                  >
                     <span>{ing.name}</span>
-                    <span className="font-medium">{ing.amountPerPerson} {ing.unit} / Person</span>
+                    <span className="font-medium">
+                      {ing.amountPerPerson} {ing.unit} / Person
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -101,9 +124,14 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
               </p>
               <ul className="space-y-1">
                 {suggestedIngredients.veggie.map((ing, i) => (
-                  <li key={i} className="text-sm flex justify-between text-gray-700">
+                  <li
+                    key={i}
+                    className="text-sm flex justify-between text-gray-700"
+                  >
                     <span>{ing.name}</span>
-                    <span className="font-medium">{ing.amountPerPerson} {ing.unit} / Person</span>
+                    <span className="font-medium">
+                      {ing.amountPerPerson} {ing.unit} / Person
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -128,7 +156,10 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
           <form
             action={async (formData: FormData) => {
               if (suggestedIngredients) {
-                formData.set("ingredients", JSON.stringify(suggestedIngredients));
+                formData.set(
+                  "ingredients",
+                  JSON.stringify(suggestedIngredients),
+                );
               }
               await createRecipe(formData);
             }}
@@ -182,6 +213,23 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
               </p>
             </div>
 
+            <div className="space-y-2 pt-2 pb-2">
+              <label className="flex items-center gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <input
+                  type="checkbox"
+                  name="isStandard"
+                  id="isStandard"
+                  className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
+                  checked={isStandard}
+                  onChange={(e) => setIsStandard(e.target.checked)}
+                />
+                Standard-Rezept (kann mehrmals in den Kalender gezogen werden)
+              </label>
+              <p className="text-xs text-gray-500 ml-6">
+                Bleibt auch nach dem Planen in der Rezeptliste des Speiseplans sichtbar.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="tags">Tags (kommasepariert)</Label>
               <Input
@@ -217,7 +265,9 @@ export function NewRecipeForm({ groups, defaultMeat, defaultVeggie }: NewRecipeF
             </div>
 
             <div className="pt-4">
-              <Button type="submit" className="w-full">Rezept speichern</Button>
+              <Button type="submit" className="w-full">
+                Rezept speichern
+              </Button>
             </div>
           </form>
         </CardContent>

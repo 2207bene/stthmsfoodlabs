@@ -26,6 +26,7 @@ interface EditRecipeDialogProps {
     allergens: string;
     notes: string | null;
     cookingTime: number | null;
+    isStandard: boolean;
   };
 }
 
@@ -38,7 +39,10 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
   const [tags, setTags] = useState(recipe.tags);
   const [allergens, setAllergens] = useState(recipe.allergens);
   const [notes, setNotes] = useState(recipe.notes ?? "");
-  const [cookingTime, setCookingTime] = useState(recipe.cookingTime ? String(recipe.cookingTime) : "");
+  const [cookingTime, setCookingTime] = useState(
+    recipe.cookingTime ? String(recipe.cookingTime) : "",
+  );
+  const [isStandard, setIsStandard] = useState(recipe.isStandard);
 
   const handleSave = () => {
     startTransition(async () => {
@@ -49,6 +53,7 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
         allergens,
         notes,
         cookingTime: cookingTime ? parseInt(cookingTime, 10) : null,
+        isStandard,
       });
       setOpen(false);
     });
@@ -73,7 +78,7 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
               <Input
                 id="edit-recipe-name"
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -82,7 +87,7 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
               <select
                 id="edit-recipe-category"
                 value={category}
-                onChange={e => setCategory(e.target.value)}
+                onChange={(e) => setCategory(e.target.value)}
                 className={SELECT_CLASS}
               >
                 <option value="Hauptgericht">Hauptgericht</option>
@@ -94,14 +99,29 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
               </select>
             </div>
 
+            <div className="space-y-2 pt-2 pb-2">
+              <label className="flex items-center gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <input
+                  type="checkbox"
+                  id="edit-recipe-standard"
+                  className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
+                  checked={isStandard}
+                  onChange={(e) => setIsStandard(e.target.checked)}
+                />
+                Standard-Rezept (kann mehrmals in den Kalender gezogen werden)
+              </label>
+            </div>
+
             <div className="space-y-1">
-              <Label htmlFor="edit-recipe-cookingtime">Kochzeit (Minuten)</Label>
+              <Label htmlFor="edit-recipe-cookingtime">
+                Kochzeit (Minuten)
+              </Label>
               <Input
                 id="edit-recipe-cookingtime"
                 type="number"
                 min={0}
                 value={cookingTime}
-                onChange={e => setCookingTime(e.target.value)}
+                onChange={(e) => setCookingTime(e.target.value)}
                 placeholder="z.B. 45"
               />
             </div>
@@ -111,17 +131,19 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
               <Input
                 id="edit-recipe-tags"
                 value={tags}
-                onChange={e => setTags(e.target.value)}
+                onChange={(e) => setTags(e.target.value)}
                 placeholder="z.B. Schnell, Günstig"
               />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="edit-recipe-allergens">Allergene (kommasepariert)</Label>
+              <Label htmlFor="edit-recipe-allergens">
+                Allergene (kommasepariert)
+              </Label>
               <Input
                 id="edit-recipe-allergens"
                 value={allergens}
-                onChange={e => setAllergens(e.target.value)}
+                onChange={(e) => setAllergens(e.target.value)}
                 placeholder="z.B. Gluten, Laktose"
               />
             </div>
@@ -131,7 +153,7 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
               <textarea
                 id="edit-recipe-notes"
                 value={notes}
-                onChange={e => setNotes(e.target.value)}
+                onChange={(e) => setNotes(e.target.value)}
                 className="flex min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Schritt für Schritt Anleitung..."
               />
@@ -139,7 +161,9 @@ export function EditRecipeDialog({ recipe }: EditRecipeDialogProps) {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Abbrechen</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Abbrechen
+            </Button>
             <Button onClick={handleSave} disabled={isPending}>
               {isPending ? "Speichert..." : "Speichern"}
             </Button>

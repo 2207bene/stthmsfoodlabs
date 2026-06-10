@@ -3,8 +3,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Sparkles, Loader2, CheckCircle, XCircle, ChevronDown, ChevronUp,
-  Users, Plus, Minus, Salad, Drumstick,
+  Sparkles,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Plus,
+  Minus,
+  Salad,
+  Drumstick,
 } from "lucide-react";
 
 export interface SuggestedIngredient {
@@ -41,10 +50,18 @@ interface AiSuggestionSectionProps {
   onAccept: (suggestion: RecipeSuggestion) => void;
 }
 
-export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAccept }: AiSuggestionSectionProps) {
+export function AiSuggestionSection({
+  groups,
+  defaultMeat,
+  defaultVeggie,
+  onAccept,
+}: AiSuggestionSectionProps) {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [suggestion, setSuggestion] = useState<Omit<RecipeSuggestion, "ingredients"> | null>(null);
+  const [suggestion, setSuggestion] = useState<Omit<
+    RecipeSuggestion,
+    "ingredients"
+  > | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(true);
 
@@ -56,7 +73,10 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
 
   // Step 3: ingredient loading + result
   const [loadingIngredients, setLoadingIngredients] = useState(false);
-  const [suggestedIngredients, setSuggestedIngredients] = useState<{ meat: SuggestedIngredient[]; veggie: SuggestedIngredient[] } | null>(null);
+  const [suggestedIngredients, setSuggestedIngredients] = useState<{
+    meat: SuggestedIngredient[];
+    veggie: SuggestedIngredient[];
+  } | null>(null);
   const [ingredientError, setIngredientError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
@@ -163,7 +183,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
       >
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-indigo-600" />
-          <span className="font-semibold text-indigo-900">KI-Rezeptvorschlag generieren</span>
+          <span className="font-semibold text-indigo-900">
+            KI-Rezeptvorschlag generieren
+          </span>
         </div>
         {expanded ? (
           <ChevronUp className="w-4 h-4 text-indigo-400" />
@@ -175,7 +197,8 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
       {expanded && (
         <div className="px-4 pb-4 space-y-4">
           <p className="text-sm text-indigo-700">
-            Beschreibe kurz, was du kochen möchtest – die KI schlägt dir ein vollständiges Rezept mit Zutaten vor.
+            Beschreibe kurz, was du kochen möchtest – die KI schlägt dir ein
+            vollständiges Rezept mit Zutaten vor.
           </p>
           <div className="flex gap-2">
             <input
@@ -202,13 +225,17 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</p>
+            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              {error}
+            </p>
           )}
 
           {suggestion && !showPersonsStep && (
             <div className="bg-white border border-indigo-200 rounded-lg p-4 space-y-3">
               <div>
-                <h3 className="font-bold text-lg text-gray-900">{suggestion.name}</h3>
+                <h3 className="font-bold text-lg text-gray-900">
+                  {suggestion.name}
+                </h3>
                 <div className="flex flex-wrap gap-2 mt-1">
                   <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
                     {suggestion.category}
@@ -218,11 +245,17 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                       ⏱ {suggestion.cookingTime} Min.
                     </span>
                   )}
-                  {suggestion.tags.split(",").filter(Boolean).map((tag) => (
-                    <span key={tag.trim()} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                      {tag.trim()}
-                    </span>
-                  ))}
+                  {suggestion.tags
+                    .split(",")
+                    .filter(Boolean)
+                    .map((tag) => (
+                      <span
+                        key={tag.trim()}
+                        className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full"
+                      >
+                        {tag.trim()}
+                      </span>
+                    ))}
                 </div>
               </div>
 
@@ -232,7 +265,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                 </p>
               )}
 
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{suggestion.notes}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {suggestion.notes}
+              </p>
 
               <div className="flex gap-2 pt-2">
                 <Button
@@ -263,19 +298,30 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
             <div className="bg-white border border-indigo-200 rounded-lg p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-indigo-600" />
-                <h3 className="font-semibold text-gray-900">Für wie viele Personen kalkulieren?</h3>
+                <h3 className="font-semibold text-gray-900">
+                  Für wie viele Personen kalkulieren?
+                </h3>
               </div>
               <p className="text-sm text-gray-500">
-                Vorausgefüllt mit den aktuellen Gruppen. Du kannst die Zahlen noch anpassen.
+                Vorausgefüllt mit den aktuellen Gruppen. Du kannst die Zahlen
+                noch anpassen.
               </p>
 
               {groups.length > 0 && (
                 <div className="bg-gray-50 rounded-md p-3 text-xs space-y-1">
-                  <p className="font-medium text-gray-600 mb-1">Aktuelle Gruppen:</p>
-                  {groups.map(g => (
-                    <div key={g.id} className="flex justify-between text-gray-500">
+                  <p className="font-medium text-gray-600 mb-1">
+                    Aktuelle Gruppen:
+                  </p>
+                  {groups.map((g) => (
+                    <div
+                      key={g.id}
+                      className="flex justify-between text-gray-500"
+                    >
                       <span>{g.name}</span>
-                      <span>{g.count} Personen · {g.isVegetarian ? "Vegetarisch" : "Mit Fleisch"}</span>
+                      <span>
+                        {g.count} Personen ·{" "}
+                        {g.isVegetarian ? "Vegetarisch" : "Mit Fleisch"}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -290,7 +336,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setPersonsMeat(Math.max(0, personsMeat - 1))}
+                      onClick={() =>
+                        setPersonsMeat(Math.max(0, personsMeat - 1))
+                      }
                       className="rounded border border-gray-300 p-1 hover:bg-gray-100"
                     >
                       <Minus className="w-3 h-3" />
@@ -299,7 +347,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                       type="number"
                       min={0}
                       value={personsMeat}
-                      onChange={(e) => setPersonsMeat(Math.max(0, Number(e.target.value)))}
+                      onChange={(e) =>
+                        setPersonsMeat(Math.max(0, Number(e.target.value)))
+                      }
                       className="w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm"
                     />
                     <button
@@ -320,7 +370,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setPersonsVeggie(Math.max(0, personsVeggie - 1))}
+                      onClick={() =>
+                        setPersonsVeggie(Math.max(0, personsVeggie - 1))
+                      }
                       className="rounded border border-gray-300 p-1 hover:bg-gray-100"
                     >
                       <Minus className="w-3 h-3" />
@@ -329,7 +381,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                       type="number"
                       min={0}
                       value={personsVeggie}
-                      onChange={(e) => setPersonsVeggie(Math.max(0, Number(e.target.value)))}
+                      onChange={(e) =>
+                        setPersonsVeggie(Math.max(0, Number(e.target.value)))
+                      }
                       className="w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm"
                     />
                     <button
@@ -344,7 +398,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
               </div>
 
               <div className="flex items-center gap-3">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Puffer %</label>
+                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                  Puffer %
+                </label>
                 <input
                   type="number"
                   min={0}
@@ -359,28 +415,37 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                   </span>
                 )}
                 {buffer === 0 && (
-                  <span className="text-xs text-gray-500">{totalPersons} Personen gesamt</span>
+                  <span className="text-xs text-gray-500">
+                    {totalPersons} Personen gesamt
+                  </span>
                 )}
               </div>
 
               {ingredientError && (
-                <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{ingredientError}</p>
+                <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                  {ingredientError}
+                </p>
               )}
 
               {suggestedIngredients && (
                 <div className="space-y-3 border border-green-200 rounded-lg p-3 bg-green-50/50">
-                  <p className="text-sm font-semibold text-green-800">KI-Vorschlag Zutaten:</p>
+                  <p className="text-sm font-semibold text-green-800">
+                    KI-Vorschlag Zutaten:
+                  </p>
 
                   {suggestedIngredients.meat.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
-                        <Drumstick className="w-3 h-3 text-orange-500" /> Mit Fleisch
+                        <Drumstick className="w-3 h-3 text-orange-500" /> Mit
+                        Fleisch
                       </p>
                       <ul className="space-y-1">
                         {suggestedIngredients.meat.map((ing, i) => (
                           <li key={i} className="text-sm flex justify-between">
                             <span>{ing.name}</span>
-                            <span className="font-medium text-gray-700">{ing.amountPerPerson} {ing.unit} / Person</span>
+                            <span className="font-medium text-gray-700">
+                              {ing.amountPerPerson} {ing.unit} / Person
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -396,7 +461,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                         {suggestedIngredients.veggie.map((ing, i) => (
                           <li key={i} className="text-sm flex justify-between">
                             <span>{ing.name}</span>
-                            <span className="font-medium text-gray-700">{ing.amountPerPerson} {ing.unit} / Person</span>
+                            <span className="font-medium text-gray-700">
+                              {ing.amountPerPerson} {ing.unit} / Person
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -418,7 +485,9 @@ export function AiSuggestionSection({ groups, defaultMeat, defaultVeggie, onAcce
                     ) : (
                       <Sparkles className="w-4 h-4" />
                     )}
-                    {loadingIngredients ? "KI berechnet Zutaten..." : "Zutaten mit KI vorschlagen"}
+                    {loadingIngredients
+                      ? "KI berechnet Zutaten..."
+                      : "Zutaten mit KI vorschlagen"}
                   </Button>
                 ) : (
                   <Button

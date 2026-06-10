@@ -27,7 +27,7 @@ export async function generateShoppingList(formData: FormData) {
   }
 
   // Apply buffer factor
-  const bufferFactor = 1 + (buffer / 100);
+  const bufferFactor = 1 + buffer / 100;
   const personsMeat = Math.ceil(totalMeat * bufferFactor);
   const personsVeggie = Math.ceil(totalVeggie * bufferFactor);
 
@@ -40,18 +40,21 @@ export async function generateShoppingList(formData: FormData) {
           versions: {
             include: {
               ingredients: {
-                include: { ingredient: true }
-              }
-            }
-          }
-        }
-      }
-    }
+                include: { ingredient: true },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   // 2. Calculate gross amounts per ingredient
   // ingredientId -> { ingredient, totalAmount }
-  const ingredientTotals = new Map<string, { ingredientId: string; amount: number }>();
+  const ingredientTotals = new Map<
+    string,
+    { ingredientId: string; amount: number }
+  >();
 
   for (const plan of mealPlans) {
     if (!plan.recipe) continue;
@@ -82,7 +85,7 @@ export async function generateShoppingList(formData: FormData) {
   // 3. Fetch current stock for these ingredients
   const allIngredientIds = Array.from(ingredientTotals.keys());
   const dbIngredients = await db.ingredient.findMany({
-    where: { id: { in: allIngredientIds } }
+    where: { id: { in: allIngredientIds } },
   });
 
   const stockMap = new Map<string, number>();
@@ -108,7 +111,7 @@ export async function generateShoppingList(formData: FormData) {
 
   // If this is a Metro list, generate Metro URLs for ingredients that don't have them yet
   if (type === "metro") {
-    const ingredientsMissingUrl = dbIngredients.filter(ing => !ing.metroUrl);
+    const ingredientsMissingUrl = dbIngredients.filter((ing) => !ing.metroUrl);
     if (ingredientsMissingUrl.length > 0) {
       const generatedUrls = await Promise.all(
         ingredientsMissingUrl.map(async (ing) => {
@@ -123,14 +126,14 @@ export async function generateShoppingList(formData: FormData) {
             console.error(`Fehler bei AI Link-Generierung für ${ing.name}:`, e);
             return { id: ing.id, metroUrl: null };
           }
-        })
+        }),
       );
 
       for (const item of generatedUrls) {
         if (item.metroUrl) {
           await db.ingredient.update({
             where: { id: item.id },
-            data: { metroUrl: item.metroUrl }
+            data: { metroUrl: item.metroUrl },
           });
         }
       }
@@ -144,9 +147,9 @@ export async function generateShoppingList(formData: FormData) {
       status: "offen",
       generatedFrom: mealPlanIds.join(","),
       items: {
-        create: itemsToCreate
-      }
-    }
+        create: itemsToCreate,
+      },
+    },
   });
 
   // 6. Redirect to list detail page

@@ -156,6 +156,7 @@ async function main() {
     name: 'Frühstück (Standard)',
     category: 'Frühstück',
     tags: 'täglich,frühstück',
+    isStandard: true,
     allergens: 'Gluten,Milch',
     notes: 'Tee: 24 l Wasser + 24 Teebeutel/Tag. Morgens warm und pur; nachmittags/abends mit Pulver (2–3 Packungen). Außerdem auf Tische: Margarine (1 Dose 250 g/Tisch), Marmelade (Förmchen), Nutella (1 Glas/Tisch), Kaba (Förmchen), Honigspender auf Buffet. Müsli nach Verfügbarkeit.',
     versions: { create: [{
@@ -177,6 +178,7 @@ async function main() {
     name: 'Abendessen (Standard)',
     category: 'Abendessen',
     tags: 'täglich,abendessen',
+    isStandard: true,
     allergens: 'Gluten,Milch',
     notes: 'Vegetarische Brotaufstriche auf das Buffet. Reste vom Mittagessen dazu stellen. Salate usw. als Extra. Abendliche ToDos: Brot backen, Tee aufkochen (Teebeutel über Nacht drin lassen), Zutaten für nächsten Tag raussuchen.',
     versions: { create: [

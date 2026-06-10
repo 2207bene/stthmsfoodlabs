@@ -41,9 +41,9 @@ export function AiCalculateButton({ recipeId }: { recipeId: string }) {
         body: JSON.stringify({ recipeId, buffer }),
       });
       const data = await res.json();
-      
+
       if (data.error) throw new Error(data.error);
-      
+
       setResult(data.result);
       setMeta(data.meta);
     } catch (err: any) {
@@ -57,7 +57,10 @@ export function AiCalculateButton({ recipeId }: { recipeId: string }) {
     <>
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1.5 border border-indigo-200 rounded-md bg-indigo-50 px-2 py-1">
-          <label htmlFor="buffer-input" className="text-xs text-indigo-600 whitespace-nowrap font-medium">
+          <label
+            htmlFor="buffer-input"
+            className="text-xs text-indigo-600 whitespace-nowrap font-medium"
+          >
             Puffer %
           </label>
           <input
@@ -88,7 +91,8 @@ export function AiCalculateButton({ recipeId }: { recipeId: string }) {
               KI-Mengenberechnung
             </DialogTitle>
             <DialogDescription>
-              Claude berechnet die Gesamtmengen basierend auf den eingetragenen Gruppen.
+              Claude berechnet die Gesamtmengen basierend auf den eingetragenen
+              Gruppen.
             </DialogDescription>
           </DialogHeader>
 
@@ -96,7 +100,9 @@ export function AiCalculateButton({ recipeId }: { recipeId: string }) {
             <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5 text-indigo-700">
                 <Users className="w-4 h-4" />
-                <span className="font-medium">{meta.totalPersons} Personen</span>
+                <span className="font-medium">
+                  {meta.totalPersons} Personen
+                </span>
                 <span className="text-indigo-400">
                   ({meta.totalMeat} Fleisch · {meta.totalVeggie} Vegetarisch)
                 </span>
@@ -104,9 +110,12 @@ export function AiCalculateButton({ recipeId }: { recipeId: string }) {
               {meta.buffer > 0 && (
                 <div className="flex items-center gap-1 text-green-700 bg-green-50 px-2 py-0.5 rounded">
                   <span>+{meta.buffer}% Puffer</span>
-                  <span className="font-bold">→ {meta.totalWithBuffer} Personen</span>
+                  <span className="font-bold">
+                    → {meta.totalWithBuffer} Personen
+                  </span>
                   <span className="text-green-500">
-                    ({meta.personsMeatWithBuffer} / {meta.personsVeggieWithBuffer})
+                    ({meta.personsMeatWithBuffer} /{" "}
+                    {meta.personsVeggieWithBuffer})
                   </span>
                 </div>
               )}

@@ -43,7 +43,10 @@ Kein weiterer Text, nur das JSON-Objekt.`;
 
     const start = contentText.indexOf("{");
     const end = contentText.lastIndexOf("}");
-    const jsonText = start !== -1 && end > start ? contentText.slice(start, end + 1) : contentText.trim();
+    const jsonText =
+      start !== -1 && end > start
+        ? contentText.slice(start, end + 1)
+        : contentText.trim();
 
     const recipe = JSON.parse(jsonText);
 

@@ -11,42 +11,53 @@ type PdfExportButtonProps = {
   groupedItems: Record<string, any[]>;
 };
 
-export function PdfExportButton({ listData, groupedItems }: PdfExportButtonProps) {
+export function PdfExportButton({
+  listData,
+  groupedItems,
+}: PdfExportButtonProps) {
   const handleExport = () => {
     const doc = new jsPDF();
-    
+
     // Title
-    const title = listData.type === "metro" ? "Metro Bestellung" : 
-                 listData.type === "vor_ort" ? "Vor-Ort Einkaufsliste" : "Einkaufsliste";
-    
+    const title =
+      listData.type === "metro"
+        ? "Metro Bestellung"
+        : listData.type === "vor_ort"
+          ? "Vor-Ort Einkaufsliste"
+          : "Einkaufsliste";
+
     doc.setFontSize(20);
     doc.text(title, 14, 22);
-    
+
     doc.setFontSize(11);
     doc.setTextColor(100);
-    doc.text(`Generiert am: ${format(new Date(listData.createdAt), "dd.MM.yyyy HH:mm")}`, 14, 30);
-    
+    doc.text(
+      `Generiert am: ${format(new Date(listData.createdAt), "dd.MM.yyyy HH:mm")}`,
+      14,
+      30,
+    );
+
     let currentY = 40;
 
     Object.entries(groupedItems).forEach(([category, items]) => {
       autoTable(doc, {
         startY: currentY,
         head: [[category, "Menge", "Abgehakt"]],
-        body: items.map(item => [
-          item.ingredient.name, 
+        body: items.map((item) => [
+          item.ingredient.name,
           `${item.amountTotal.toLocaleString("de-DE")} ${item.ingredient.unit}`,
-          "" // Empty column for checking off manually
+          "", // Empty column for checking off manually
         ]),
-        theme: 'striped',
+        theme: "striped",
         headStyles: { fillColor: [41, 128, 185] },
         styles: { fontSize: 10 },
         columnStyles: {
           0: { cellWidth: 100 },
           1: { cellWidth: 40 },
-          2: { cellWidth: 40 }
-        }
+          2: { cellWidth: 40 },
+        },
       });
-      
+
       currentY = (doc as any).lastAutoTable.finalY + 10;
     });
 

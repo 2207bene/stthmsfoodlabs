@@ -6,7 +6,13 @@ import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { generateShoppingList } from "./actions";
 
 export default async function NewShoppingListPage() {
@@ -17,24 +23,35 @@ export default async function NewShoppingListPage() {
   });
 
   // Group by date to show a nice summary
-  const groupedByDate = mealPlans.reduce((acc, plan) => {
-    const dateStr = format(plan.date, "yyyy-MM-dd");
-    if (!acc[dateStr]) acc[dateStr] = [];
-    acc[dateStr].push(plan);
-    return acc;
-  }, {} as Record<string, typeof mealPlans>);
+  const groupedByDate = mealPlans.reduce(
+    (acc, plan) => {
+      const dateStr = format(plan.date, "yyyy-MM-dd");
+      if (!acc[dateStr]) acc[dateStr] = [];
+      acc[dateStr].push(plan);
+      return acc;
+    },
+    {} as Record<string, typeof mealPlans>,
+  );
 
   const hasPlans = mealPlans.length > 0;
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-2xl">
-      <h1 className="text-3xl font-bold tracking-tight mb-6">Neue Einkaufsliste generieren</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-6">
+        Neue Einkaufsliste generieren
+      </h1>
 
       <div className="bg-card border rounded-lg p-6 shadow-sm">
         {!hasPlans ? (
           <div className="text-center py-6">
-            <p className="text-muted-foreground mb-4">Es gibt aktuell keine geplanten Gerichte im Speiseplan, für die eine Liste generiert werden könnte.</p>
-            <Link href="/mealplan" className={buttonVariants({ variant: "outline" })}>
+            <p className="text-muted-foreground mb-4">
+              Es gibt aktuell keine geplanten Gerichte im Speiseplan, für die
+              eine Liste generiert werden könnte.
+            </p>
+            <Link
+              href="/mealplan"
+              className={buttonVariants({ variant: "outline" })}
+            >
               Zum Speiseplan
             </Link>
           </div>
@@ -48,23 +65,38 @@ export default async function NewShoppingListPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="metro">Metro Lieferung</SelectItem>
-                  <SelectItem value="vor_ort">Vor-Ort Einkauf (Aldi, Rewe...)</SelectItem>
+                  <SelectItem value="vor_ort">
+                    Vor-Ort Einkauf (Aldi, Rewe...)
+                  </SelectItem>
                   <SelectItem value="sonstiges">Sonstiges / Spenden</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-3">
-              <Label>Einbezogene Tage (Automatisch aus Speiseplan "geplant")</Label>
+              <Label>
+                Einbezogene Tage (Automatisch aus Speiseplan "geplant")
+              </Label>
               <div className="bg-muted/50 rounded-md p-4 max-h-60 overflow-y-auto space-y-4">
                 {Object.entries(groupedByDate).map(([dateStr, plans]) => (
                   <div key={dateStr}>
-                    <h4 className="font-semibold text-sm mb-1">{format(new Date(dateStr), "EEEE, dd.MM.", { locale: de })}</h4>
+                    <h4 className="font-semibold text-sm mb-1">
+                      {format(new Date(dateStr), "EEEE, dd.MM.", {
+                        locale: de,
+                      })}
+                    </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {plans.map(p => (
+                      {plans.map((p) => (
                         <li key={p.id}>
-                          • {p.mealTime}: {p.recipe ? p.recipe.name : p.specialName || "Ohne Rezept"}
-                          <input type="hidden" name="mealPlanIds" value={p.id} />
+                          • {p.mealTime}:{" "}
+                          {p.recipe
+                            ? p.recipe.name
+                            : p.specialName || "Ohne Rezept"}
+                          <input
+                            type="hidden"
+                            name="mealPlanIds"
+                            value={p.id}
+                          />
                         </li>
                       ))}
                     </ul>
@@ -86,7 +118,8 @@ export default async function NewShoppingListPage() {
                   className="w-28"
                 />
                 <p className="text-sm text-muted-foreground">
-                  Prozentuale Zugabe auf alle berechneten Mengen (z.B. 10 = +10%).
+                  Prozentuale Zugabe auf alle berechneten Mengen (z.B. 10 =
+                  +10%).
                 </p>
               </div>
             </div>

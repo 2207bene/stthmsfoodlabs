@@ -28,6 +28,7 @@ model Recipe {
   notes       String?
   allergens   String   // comma-separated
   personCount Int?     // defaults to group calc
+  isStandard  Boolean  @default(false)
 
   versions    RecipeVersion[]
   mealPlans   MealPlanEntry[]
@@ -150,4 +151,14 @@ model ShoppingListItem {
   amountObtained Float        @default(0)
   checked        Boolean      @default(false)
   notes          String?
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  description    String
+  dueDate        DateTime?
+  responsibility String?
+  completed      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

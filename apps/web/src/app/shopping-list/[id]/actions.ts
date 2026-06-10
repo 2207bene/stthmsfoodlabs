@@ -6,13 +6,14 @@ import { generateMetroSearchUrl } from "@/lib/ai";
 
 export async function updateAmountObtained(formData: FormData) {
   const itemId = formData.get("itemId") as string;
-  const amountObtained = parseFloat(formData.get("amountObtained") as string) || 0;
+  const amountObtained =
+    parseFloat(formData.get("amountObtained") as string) || 0;
 
   if (!itemId) return;
 
   const updated = await db.shoppingListItem.update({
     where: { id: itemId },
-    data: { amountObtained }
+    data: { amountObtained },
   });
 
   revalidatePath(`/shopping-list/${updated.shoppingListId}`);
@@ -26,16 +27,16 @@ export async function toggleItemChecked(formData: FormData) {
 
   const updated = await db.shoppingListItem.update({
     where: { id: itemId },
-    data: { checked }
+    data: { checked },
   });
 
   // Check if all items are checked to update list status
   const allItems = await db.shoppingListItem.findMany({
-    where: { shoppingListId: updated.shoppingListId }
+    where: { shoppingListId: updated.shoppingListId },
   });
 
-  const allChecked = allItems.every(i => i.checked);
-  const anyChecked = allItems.some(i => i.checked);
+  const allChecked = allItems.every((i) => i.checked);
+  const anyChecked = allItems.some((i) => i.checked);
 
   let newStatus = "offen";
   if (allChecked) newStatus = "abgeschlossen";
@@ -43,7 +44,7 @@ export async function toggleItemChecked(formData: FormData) {
 
   await db.shoppingList.update({
     where: { id: updated.shoppingListId },
-    data: { status: newStatus }
+    data: { status: newStatus },
   });
 
   revalidatePath(`/shopping-list/${updated.shoppingListId}`);
@@ -111,9 +112,10 @@ export async function confirmPurchase(formData: FormData) {
   });
 
   for (const item of checkedItems) {
-    const bookedAmount = (item.amountObtained ?? 0) > 0
-      ? (item.amountObtained ?? 0)
-      : item.amountTotal;
+    const bookedAmount =
+      (item.amountObtained ?? 0) > 0
+        ? (item.amountObtained ?? 0)
+        : item.amountTotal;
 
     await db.ingredient.update({
       where: { id: item.ingredientId },
@@ -161,7 +163,7 @@ export async function updateIngredientMetroUrl(formData: FormData) {
 
   await db.ingredient.update({
     where: { id: ingredientId },
-    data: { metroUrl: finalUrl }
+    data: { metroUrl: finalUrl },
   });
 
   if (shoppingListId) {
@@ -176,7 +178,7 @@ export async function regenerateMetroUrlWithAI(formData: FormData) {
   if (!ingredientId) return;
 
   const ingredient = await db.ingredient.findUnique({
-    where: { id: ingredientId }
+    where: { id: ingredientId },
   });
 
   if (!ingredient) return;
@@ -185,12 +187,12 @@ export async function regenerateMetroUrlWithAI(formData: FormData) {
     const url = await generateMetroSearchUrl({
       name: ingredient.name,
       unit: ingredient.unit,
-      category: ingredient.category
+      category: ingredient.category,
     });
 
     await db.ingredient.update({
       where: { id: ingredientId },
-      data: { metroUrl: url }
+      data: { metroUrl: url },
     });
   } catch (error) {
     console.error("Fehler bei AI Link-Regeneration:", error);

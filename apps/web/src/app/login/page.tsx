@@ -5,7 +5,14 @@ import { login } from "../actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import Image from "next/image";
 
 const initialState = {
@@ -21,9 +28,9 @@ export default function LoginPage() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center mb-2">
             <div className="relative h-16 w-48 aspect-[3/1]">
-              <Image 
-                src="/logo.png" 
-                alt="STTHMS Food Labs" 
+              <Image
+                src="/logo.png"
+                alt="STTHMS Food Labs"
                 fill
                 className="object-contain"
                 priority
@@ -31,7 +38,9 @@ export default function LoginPage() {
               />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">Login</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Login
+          </CardTitle>
           <CardDescription>
             Bitte gib das globale Passwort für den Küchenchef ein.
           </CardDescription>

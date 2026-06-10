@@ -1,12 +1,16 @@
-"use server"
+"use server";
 
-import { prisma } from "@kjg/database"
-import { revalidatePath } from "next/cache"
-import { getPersonGroupCounts } from "./groups"
+import { prisma } from "@kjg/database";
+import { revalidatePath } from "next/cache";
+import { getPersonGroupCounts } from "./groups";
 
-export async function assignRecipeToMealTime(recipeId: string, dateStr: string, mealTime: string) {
-  const date = new Date(dateStr)
-  const counts = await getPersonGroupCounts()
+export async function assignRecipeToMealTime(
+  recipeId: string,
+  dateStr: string,
+  mealTime: string,
+) {
+  const date = new Date(dateStr);
+  const counts = await getPersonGroupCounts();
 
   const entry = await prisma.mealPlanEntry.create({
     data: {
@@ -16,34 +20,38 @@ export async function assignRecipeToMealTime(recipeId: string, dateStr: string, 
       status: "geplant",
       personCountMeat: counts.meat,
       personCountVeggie: counts.veggie,
-    }
-  })
+    },
+  });
 
-  revalidatePath("/mealplan")
-  return entry.id
+  revalidatePath("/mealplan");
+  return entry.id;
 }
 
-export async function moveMealPlanEntry(entryId: string, newDateStr: string, newMealTime: string) {
-  const newDate = new Date(newDateStr)
-  
+export async function moveMealPlanEntry(
+  entryId: string,
+  newDateStr: string,
+  newMealTime: string,
+) {
+  const newDate = new Date(newDateStr);
+
   // If moving a regular meal to a slot that already has one, we might want to swap or override.
   // For simplicity, we just override/update the moved entry.
   await prisma.mealPlanEntry.update({
     where: { id: entryId },
     data: {
       date: newDate,
-      mealTime: newMealTime
-    }
-  })
+      mealTime: newMealTime,
+    },
+  });
 
-  revalidatePath("/mealplan")
+  revalidatePath("/mealplan");
 }
 
 export async function removeMealPlanEntry(entryId: string) {
   await prisma.mealPlanEntry.deleteMany({
-    where: { id: entryId }
-  })
-  revalidatePath("/mealplan")
+    where: { id: entryId },
+  });
+  revalidatePath("/mealplan");
 }
 
 export async function updateMealPlanStatus(entryId: string, status: string) {
@@ -54,12 +62,12 @@ export async function updateMealPlanStatus(entryId: string, status: string) {
         include: {
           versions: {
             include: {
-              ingredients: true
-            }
-          }
-        }
-      }
-    }
+              ingredients: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!entry) throw new Error("Entry not found");
@@ -79,7 +87,7 @@ export async function updateMealPlanStatus(entryId: string, status: string) {
 
       for (const recipeIng of version.ingredients) {
         const totalForRecipe = recipeIng.amountPerPerson * persons;
-        
+
         stockMovements.push({
           ingredientId: recipeIng.ingredientId,
           amount: totalForRecipe,
@@ -94,32 +102,31 @@ export async function updateMealPlanStatus(entryId: string, status: string) {
     await prisma.$transaction(async (tx) => {
       for (const move of stockMovements) {
         await tx.stockMovement.create({
-          data: move
+          data: move,
         });
-        
+
         await tx.ingredient.update({
           where: { id: move.ingredientId },
           data: {
             currentStock: {
-              decrement: move.amount
-            }
-          }
+              decrement: move.amount,
+            },
+          },
         });
       }
-      
+
       await tx.mealPlanEntry.update({
         where: { id: entryId },
-        data: { status }
+        data: { status },
       });
     });
   } else {
     await prisma.mealPlanEntry.update({
       where: { id: entryId },
-      data: { status }
+      data: { status },
     });
   }
 
   revalidatePath("/mealplan");
   revalidatePath("/inventory");
 }
-

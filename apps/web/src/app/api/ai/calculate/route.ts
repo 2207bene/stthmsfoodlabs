@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
         versions: {
           include: {
             ingredients: {
-              include: { ingredient: true }
-            }
-          }
-        }
-      }
+              include: { ingredient: true },
+            },
+          },
+        },
+      },
     });
 
     if (!recipe) {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const totalPersons = totalMeat + totalVeggie;
 
     // Apply buffer
-    const bufferFactor = 1 + (buffer / 100);
+    const bufferFactor = 1 + buffer / 100;
     const personsMeatWithBuffer = Math.ceil(totalMeat * bufferFactor);
     const personsVeggieWithBuffer = Math.ceil(totalVeggie * bufferFactor);
     const totalWithBuffer = Math.ceil(totalPersons * bufferFactor);
@@ -59,11 +59,16 @@ export async function POST(req: NextRequest) {
 
     const manualTotal = groups.reduce((s, g) => s + g.count, 0);
     const campflowCount = totalPersons - manualTotal;
-    const groupParts = groups.map(g => `${g.name}: ${g.count} Personen (${g.isVegetarian ? "vegetarisch" : "mit Fleisch"})`);
-    if (campflowCount > 0) groupParts.push(`Campflow-Import: ${campflowCount} weitere Personen`);
-    const groupSummary = groupParts.length === 0
-      ? "Keine Personen eingetragen (bitte Gruppen oder Campflow-Import anlegen)."
-      : groupParts.join(", ");
+    const groupParts = groups.map(
+      (g) =>
+        `${g.name}: ${g.count} Personen (${g.isVegetarian ? "vegetarisch" : "mit Fleisch"})`,
+    );
+    if (campflowCount > 0)
+      groupParts.push(`Campflow-Import: ${campflowCount} weitere Personen`);
+    const groupSummary =
+      groupParts.length === 0
+        ? "Keine Personen eingetragen (bitte Gruppen oder Campflow-Import anlegen)."
+        : groupParts.join(", ");
 
     const prompt = `Du bist ein Küchen-Assistent für ein Sommerlager.
 
@@ -81,15 +86,15 @@ Formatiere die Ausgabe als übersichtlichen Text (Markdown-fähig), der direkt e
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
-      messages: [{ role: "user", content: prompt }]
+      messages: [{ role: "user", content: prompt }],
     });
 
     let contentText = "Keine Antwort generiert.";
     if (message.content && message.content.length > 0) {
-       const firstBlock = message.content[0];
-       if ('text' in firstBlock) {
-         contentText = firstBlock.text;
-       }
+      const firstBlock = message.content[0];
+      if ("text" in firstBlock) {
+        contentText = firstBlock.text;
+      }
     }
 
     return NextResponse.json({
@@ -102,9 +107,8 @@ Formatiere die Ausgabe als übersichtlichen Text (Markdown-fähig), der direkt e
         totalWithBuffer,
         personsMeatWithBuffer,
         personsVeggieWithBuffer,
-      }
+      },
     });
-
   } catch (error: any) {
     console.error("AI Calculate Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

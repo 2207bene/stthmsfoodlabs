@@ -10,8 +10,13 @@ import { AiCalculateButton } from "./AiCalculateButton";
 import { EditRecipeDialog } from "./EditRecipeDialog";
 import { IngredientsCard } from "./IngredientsCard";
 import { getPersonGroupCounts } from "@/app/actions/groups";
+import { StandardRecipeToggle } from "./StandardRecipeToggle";
 
-export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function RecipeDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   const [recipe, groups, counts] = await Promise.all([
@@ -21,11 +26,11 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         versions: {
           include: {
             ingredients: {
-              include: { ingredient: true }
-            }
-          }
-        }
-      }
+              include: { ingredient: true },
+            },
+          },
+        },
+      },
     }),
     prisma.personGroup.findMany({
       orderBy: { createdAt: "asc" },
@@ -36,14 +41,17 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
   if (!recipe) return notFound();
 
-  const meatVersion = recipe.versions.find(v => v.type === "MIT_FLEISCH");
-  const veggieVersion = recipe.versions.find(v => v.type === "VEGETARISCH");
+  const meatVersion = recipe.versions.find((v) => v.type === "MIT_FLEISCH");
+  const veggieVersion = recipe.versions.find((v) => v.type === "VEGETARISCH");
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto font-sans">
       <div className="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-          <Link href="/recipes" className="text-gray-500 hover:text-black flex items-center gap-2 mb-4 text-sm w-fit">
+          <Link
+            href="/recipes"
+            className="text-gray-500 hover:text-black flex items-center gap-2 mb-4 text-sm w-fit"
+          >
             <ArrowLeft className="w-4 h-4" />
             Zurück zur Übersicht
           </Link>
@@ -53,19 +61,24 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
         <div className="flex flex-wrap gap-2">
           <AiCalculateButton recipeId={recipe.id} />
-          <EditRecipeDialog recipe={{
-            id: recipe.id,
-            name: recipe.name,
-            category: recipe.category,
-            tags: recipe.tags,
-            allergens: recipe.allergens,
-            notes: recipe.notes ?? null,
-            cookingTime: recipe.cookingTime ?? null,
-          }} />
-          <form action={async () => {
-            "use server"
-            await deleteRecipe(recipe.id)
-          }}>
+          <EditRecipeDialog
+            recipe={{
+              id: recipe.id,
+              name: recipe.name,
+              category: recipe.category,
+              tags: recipe.tags,
+              allergens: recipe.allergens,
+              notes: recipe.notes ?? null,
+              cookingTime: recipe.cookingTime ?? null,
+              isStandard: recipe.isStandard,
+            }}
+          />
+          <form
+            action={async () => {
+              "use server";
+              await deleteRecipe(recipe.id);
+            }}
+          >
             <Button variant="destructive" className="gap-2">
               <Trash2 className="w-4 h-4" />
               Löschen
@@ -78,8 +91,12 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         <div className="md:col-span-2">
           <Tabs defaultValue="meat" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="meat" disabled={!meatVersion}>🥩 Mit Fleisch</TabsTrigger>
-              <TabsTrigger value="veggie" disabled={!veggieVersion}>🥦 Vegetarisch</TabsTrigger>
+              <TabsTrigger value="meat" disabled={!meatVersion}>
+                🥩 Mit Fleisch
+              </TabsTrigger>
+              <TabsTrigger value="veggie" disabled={!veggieVersion}>
+                🥦 Vegetarisch
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="meat" className="mt-4">
@@ -87,7 +104,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                 <IngredientsCard
                   versionId={meatVersion.id}
                   versionType="MIT_FLEISCH"
-                  initialIngredients={meatVersion.ingredients.map(ing => ({
+                  initialIngredients={meatVersion.ingredients.map((ing) => ({
                     id: ing.id,
                     amountPerPerson: ing.amountPerPerson,
                     unit: ing.unit,
@@ -102,7 +119,9 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                   defaultPersons={counts.meat}
                 />
               ) : (
-                <p className="text-sm text-gray-500 italic p-4">Keine Fleisch-Version vorhanden.</p>
+                <p className="text-sm text-gray-500 italic p-4">
+                  Keine Fleisch-Version vorhanden.
+                </p>
               )}
             </TabsContent>
 
@@ -111,7 +130,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                 <IngredientsCard
                   versionId={veggieVersion.id}
                   versionType="VEGETARISCH"
-                  initialIngredients={veggieVersion.ingredients.map(ing => ({
+                  initialIngredients={veggieVersion.ingredients.map((ing) => ({
                     id: ing.id,
                     amountPerPerson: ing.amountPerPerson,
                     unit: ing.unit,
@@ -126,7 +145,9 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                   defaultPersons={counts.veggie}
                 />
               ) : (
-                <p className="text-sm text-gray-500 italic p-4">Keine Vegetarisch-Version vorhanden.</p>
+                <p className="text-sm text-gray-500 italic p-4">
+                  Keine Vegetarisch-Version vorhanden.
+                </p>
               )}
             </TabsContent>
           </Tabs>
@@ -138,27 +159,64 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
               <CardTitle>Informationen</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  Typ
+                </h3>
+                <StandardRecipeToggle recipeId={recipe.id} initialValue={recipe.isStandard} />
+              </div>
+
               {recipe.cookingTime && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Kochzeit</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    Kochzeit
+                  </h3>
                   <p className="text-sm">⏱ {recipe.cookingTime} Min.</p>
                 </div>
               )}
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Tags</h3>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  Tags
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {recipe.tags ? recipe.tags.split(",").map(tag => tag.trim() && (
-                    <span key={tag} className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs">{tag}</span>
-                  )) : <span className="text-sm text-gray-500">-</span>}
+                  {recipe.tags ? (
+                    recipe.tags.split(",").map(
+                      (tag) =>
+                        tag.trim() && (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ),
+                    )
+                  ) : (
+                    <span className="text-sm text-gray-500">-</span>
+                  )}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Allergene</h3>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  Allergene
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {recipe.allergens ? recipe.allergens.split(",").map(alg => alg.trim() && (
-                    <span key={alg} className="px-2 py-1 bg-red-50 text-red-700 rounded text-xs border border-red-100">{alg}</span>
-                  )) : <span className="text-sm text-gray-500">-</span>}
+                  {recipe.allergens ? (
+                    recipe.allergens.split(",").map(
+                      (alg) =>
+                        alg.trim() && (
+                          <span
+                            key={alg}
+                            className="px-2 py-1 bg-red-50 text-red-700 rounded text-xs border border-red-100"
+                          >
+                            {alg}
+                          </span>
+                        ),
+                    )
+                  ) : (
+                    <span className="text-sm text-gray-500">-</span>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -170,9 +228,13 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
             </CardHeader>
             <CardContent>
               {recipe.notes ? (
-                <div className="whitespace-pre-wrap text-sm text-gray-700">{recipe.notes}</div>
+                <div className="whitespace-pre-wrap text-sm text-gray-700">
+                  {recipe.notes}
+                </div>
               ) : (
-                <p className="text-sm text-gray-500 italic">Keine Zubereitungshinweise vorhanden.</p>
+                <p className="text-sm text-gray-500 italic">
+                  Keine Zubereitungshinweise vorhanden.
+                </p>
               )}
             </CardContent>
           </Card>

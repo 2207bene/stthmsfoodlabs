@@ -1,19 +1,21 @@
-"use server"
+"use server";
 
-import { prisma } from "@kjg/database"
-import { revalidatePath } from "next/cache"
+import { prisma } from "@kjg/database";
+import { revalidatePath } from "next/cache";
 
 const ALLOWED_UNITS = ["kg", "l", "pkg", "pcs"];
 const ALLOWED_KUCHEN_UNITS = ["pcs", "kg", "pkg"];
 
 export async function addIngredient(formData: FormData) {
-  const name = formData.get("name") as string
-  const unit = formData.get("unit") as string
-  const category = formData.get("category") as string
-  const initialStock = parseFloat(formData.get("initialStock") as string) || 0
+  const name = formData.get("name") as string;
+  const unit = formData.get("unit") as string;
+  const category = formData.get("category") as string;
+  const initialStock = parseFloat(formData.get("initialStock") as string) || 0;
 
   if (!ALLOWED_UNITS.includes(unit)) {
-    throw new Error(`Ungültige Einheit: ${unit}. Erlaubte Einheiten: ${ALLOWED_UNITS.join(", ")}`)
+    throw new Error(
+      `Ungültige Einheit: ${unit}. Erlaubte Einheiten: ${ALLOWED_UNITS.join(", ")}`,
+    );
   }
 
   const ingredient = await prisma.ingredient.create({
@@ -22,9 +24,9 @@ export async function addIngredient(formData: FormData) {
       unit,
       category,
       allergens: "",
-      currentStock: initialStock
-    }
-  })
+      currentStock: initialStock,
+    },
+  });
 
   if (initialStock > 0) {
     await prisma.stockMovement.create({
@@ -33,28 +35,34 @@ export async function addIngredient(formData: FormData) {
         amount: initialStock,
         direction: 1,
         type: "korrektur",
-        notes: "Anfangsbestand bei Erstellung"
-      }
-    })
+        notes: "Anfangsbestand bei Erstellung",
+      },
+    });
   }
 
-  revalidatePath("/inventory")
+  revalidatePath("/inventory");
 }
 
-export async function bookStock(ingredientId: string, amount: number, isAdding: boolean) {
-  const ingredient = await prisma.ingredient.findUnique({ where: { id: ingredientId } })
-  if (!ingredient) return
+export async function bookStock(
+  ingredientId: string,
+  amount: number,
+  isAdding: boolean,
+) {
+  const ingredient = await prisma.ingredient.findUnique({
+    where: { id: ingredientId },
+  });
+  if (!ingredient) return;
 
-  const direction = isAdding ? 1 : -1
-  const type = isAdding ? "einkauf" : "verbrauch"
+  const direction = isAdding ? 1 : -1;
+  const type = isAdding ? "einkauf" : "verbrauch";
 
   // Update stock
   await prisma.ingredient.update({
     where: { id: ingredientId },
     data: {
-      currentStock: ingredient.currentStock + (amount * direction)
-    }
-  })
+      currentStock: ingredient.currentStock + amount * direction,
+    },
+  });
 
   // Create movement record
   await prisma.stockMovement.create({
@@ -62,37 +70,43 @@ export async function bookStock(ingredientId: string, amount: number, isAdding: 
       ingredientId,
       amount,
       direction,
-      type
-    }
-  })
+      type,
+    },
+  });
 
-  revalidatePath("/inventory")
+  revalidatePath("/inventory");
 }
 
 export async function bookKuchenspende(formData: FormData) {
-  const name = (formData.get("name") as string).trim()
-  const amount = parseFloat(formData.get("amount") as string)
-  const unit = formData.get("unit") as string
-  const notes = (formData.get("notes") as string | null)?.trim() || null
+  const name = (formData.get("name") as string).trim();
+  const amount = parseFloat(formData.get("amount") as string);
+  const unit = formData.get("unit") as string;
+  const notes = (formData.get("notes") as string | null)?.trim() || null;
 
-  if (!name || isNaN(amount) || amount <= 0) return
-  if (!ALLOWED_KUCHEN_UNITS.includes(unit)) return
+  if (!name || isNaN(amount) || amount <= 0) return;
+  if (!ALLOWED_KUCHEN_UNITS.includes(unit)) return;
 
   // Find or create the ingredient
   let ingredient = await prisma.ingredient.findFirst({
     where: { name, category: "Kuchenspenden" },
-  })
+  });
   if (!ingredient) {
     ingredient = await prisma.ingredient.create({
-      data: { name, unit, category: "Kuchenspenden", allergens: "", currentStock: 0 },
-    })
+      data: {
+        name,
+        unit,
+        category: "Kuchenspenden",
+        allergens: "",
+        currentStock: 0,
+      },
+    });
   }
 
   // Book stock movement
   await prisma.ingredient.update({
     where: { id: ingredient.id },
     data: { currentStock: ingredient.currentStock + amount },
-  })
+  });
   await prisma.stockMovement.create({
     data: {
       ingredientId: ingredient.id,
@@ -101,12 +115,12 @@ export async function bookKuchenspende(formData: FormData) {
       type: "kuchenspende",
       notes,
     },
-  })
+  });
 
   // Create a recipe so it shows up in Rezeptverwaltung and calendar sidebar
   const existingRecipe = await prisma.recipe.findFirst({
     where: { name, category: "Kuchenspenden" },
-  })
+  });
   if (!existingRecipe) {
     await prisma.recipe.create({
       data: {
@@ -115,10 +129,10 @@ export async function bookKuchenspende(formData: FormData) {
         tags: "Kuchenspende",
         allergens: "",
       },
-    })
+    });
   }
 
-  revalidatePath("/inventory")
-  revalidatePath("/recipes")
-  revalidatePath("/mealplan")
+  revalidatePath("/inventory");
+  revalidatePath("/recipes");
+  revalidatePath("/mealplan");
 }

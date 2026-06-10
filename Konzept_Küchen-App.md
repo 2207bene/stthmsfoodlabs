@@ -1,4 +1,5 @@
 # Konzept: Küchen-App für Sommerlager
+
 **Für:** KJG Sommerlager · ~80 Personen · 1 Woche  
 **Stand:** Mai 2026  
 **Erstellt von:** Claude (Softwareentwickler-Modus)
@@ -8,6 +9,7 @@
 ## 1. Ausgangslage & Ziele
 
 ### Kontext (aus den vorliegenden Dokumenten)
+
 - **~80 Personen** (66 Kinder + 15 Leiter + 2 Küche), davon ca. 25 Vegetarier
 - **4 Mahlzeiten täglich:** Frühstück (8:30) · Mittagessen (12:30) · Nachmittag (15:00) · Abendessen (18:30)
 - **Bestellung:** Metro-Lieferung (1–2× pro Woche), zusätzlich Essensspenden
@@ -15,6 +17,7 @@
 - **Kalkulation:** Bisher auf Basis von ~95 Personen (Puffer), Fleisch für ~70, Veggie für ~25
 
 ### Ziele der App
+
 1. Speiseplanung visuell und übersichtlich machen
 2. Einkaufslisten automatisch aus Rezepten generieren
 3. Mengenberechnung KI-gestützt (Claude API) nach Personengruppen
@@ -26,11 +29,11 @@
 
 ## 2. Benutzerrollen
 
-| Rolle | Rechte | Typischer Use Case |
-|-------|--------|--------------------|
-| **Küchenchef** | Alles | Plant Speiseplan, pflegt Rezepte, verwaltet Lager |
-| **Köchin** | Kochen bestätigen, Lager anpassen | Verbucht gekochte Gerichte, meldet Verbrauch |
-| **Einkäufer** | Einkaufsliste lesen & abhaken | Unterwegs bei Metro, Aldi etc. |
+| Rolle          | Rechte                            | Typischer Use Case                                |
+| -------------- | --------------------------------- | ------------------------------------------------- |
+| **Küchenchef** | Alles                             | Plant Speiseplan, pflegt Rezepte, verwaltet Lager |
+| **Köchin**     | Kochen bestätigen, Lager anpassen | Verbucht gekochte Gerichte, meldet Verbrauch      |
+| **Einkäufer**  | Einkaufsliste lesen & abhaken     | Unterwegs bei Metro, Aldi etc.                    |
 
 ---
 
@@ -52,7 +55,7 @@
 
 ### 4.1 Speiseplan (Kalender)
 
-**Ansicht:** Wochenkalender mit 4 Zeilen pro Tag + optionalen Specials  
+**Ansicht:** Wochenkalender mit 4 Zeilen pro Tag + optionalen Specials
 
 ```
          Mo 02.08        Di 03.08        Mi 04.08   ...
@@ -67,21 +70,23 @@
 
 **Farbcodierung nach Mahlzeittyp (fix, immer sichtbar):**
 
-| Farbe | Mahlzeit | Erklärung |
-|-------|----------|-----------|
-| 🟠 Orange | Frühstück | Morgen-Energie |
-| 🟢 Grün | Mittagessen | Hauptmahlzeit des Tages |
-| 🟣 Lila | Nachmittag / Snack | Zwischenmahlzeit |
-| 🔵 Blau | Abendessen | Abend-Routine |
-| 🟡 Gelb | Special | Besondere Mahlzeit / Extras |
+| Farbe     | Mahlzeit           | Erklärung                   |
+| --------- | ------------------ | --------------------------- |
+| 🟠 Orange | Frühstück          | Morgen-Energie              |
+| 🟢 Grün   | Mittagessen        | Hauptmahlzeit des Tages     |
+| 🟣 Lila   | Nachmittag / Snack | Zwischenmahlzeit            |
+| 🔵 Blau   | Abendessen         | Abend-Routine               |
+| 🟡 Gelb   | Special            | Besondere Mahlzeit / Extras |
 
 Innerhalb jeder farbigen Zelle zeigt ein kleines Icon den Bearbeitungsstatus:
+
 - ○ leer / noch nicht geplant
 - ● geplant
 - ⚙ in Vorbereitung
 - ✓ gekocht
 
 **Specials — ein oder mehrere pro Tag:**
+
 - Jeder Tag kann beliebig viele Specials erhalten (z. B. Geburtstagskuchen, Lagerfeuer-Snack, Mitternachts-Überraschung)
 - Special hinzufügen: „+ Special" Button unter den vier Standardmahlzeiten
 - Jedes Special hat: Name / Rezept-Verknüpfung (optional), Uhrzeit (optional), Notiz, Status (wie Standardmahlzeiten)
@@ -89,12 +94,14 @@ Innerhalb jeder farbigen Zelle zeigt ein kleines Icon den Bearbeitungsstatus:
 - Specials werden in der Wochenübersicht als kompakte Chips unter den Tages-Mahlzeiten angezeigt
 
 **Weitere Funktionen:**
+
 - Tippen auf eine Zelle → Rezept auswählen oder neu erstellen
 - Notizfeld pro Mahlzeit (z. B. „Veggie-Option: Gemüsebolognese")
 - Vegetarische Alternative parallel eintragen
 - Ansicht als Liste oder als Kalender umschaltbar
 
 **Aus Euren Dokumenten übernehmen:**
+
 - Frühstück ist immer gleich (Standard-Vorlage nach „Gudruns heiligem Zettel")
 - Abendessen fast immer Brot/Wurst/Käse (Standard-Vorlage)
 - Nur Mittagessen variiert täglich → Hauptfokus der Planung
@@ -128,6 +135,7 @@ Rezept: Chili
 Die App liest automatisch aus der Gruppenstruktur (Modul 4.5) aus, wie viele Personen Fleischesser und wie viele Vegetarier sind. Beim Öffnen eines Rezepts sind diese Zahlen bereits vorausgefüllt — sie können für einzelne Gerichte manuell überschrieben werden (z. B. wenn ein Teil der Gruppe an dem Tag nicht dabei ist).
 
 **Funktionen:**
+
 - Skalierungs-Slider: Personenzahl anpassen → alle Mengen beider Versionen werden angepasst
 - Fleisch- und vegetarische Version in einer Ansicht, umschaltbar
 - Rezept bearbeiten: jede Zutat, Menge, Einheit und Zubereitung ist editierbar
@@ -141,11 +149,13 @@ Die App liest automatisch aus der Gruppenstruktur (Modul 4.5) aus, wie viele Per
 ### 4.3 Einkaufsliste
 
 **Automatische Generierung:**
+
 1. Alle Rezepte der Woche → Zutaten werden summiert und nach Kategorien zusammengefasst
 2. Lagerbestand wird abgezogen (was schon da ist, muss nicht gekauft werden)
 3. Ergebnis: vollständige, kategorisierte Einkaufsliste
 
 **Kategorien (wie in Euren Dokumenten):**
+
 - 🧴 Öle & Essige
 - 🧂 Gewürze & Würzmittel
 - 🍞 Back- & Trockenwaren
@@ -156,6 +166,7 @@ Die App liest automatisch aus der Gruppenstruktur (Modul 4.5) aus, wie viele Per
 - 🧹 Reinigungsmittel & Sonstiges
 
 **Einkaufsansicht (mobil):**
+
 ```
 🛒 Einkaufsliste – Metro Lieferung Mo 04.08
 ──────────────────────────────────────────
@@ -170,6 +181,7 @@ Die App liest automatisch aus der Gruppenstruktur (Modul 4.5) aus, wie viele Per
 ```
 
 **Weitere Funktionen:**
+
 - Teilen als PDF oder per Link (für Lieferbestellung an Metro)
 - Notizfeld pro Position (z. B. „glutenfrei beachten!")
 - Mehrere Einkaufslisten parallel (z. B. Metro-Lieferung + Aldi-Einkauf)
@@ -184,7 +196,7 @@ Die App liest automatisch aus der Gruppenstruktur (Modul 4.5) aus, wie viele Per
 ```
 Lagerbewegungen:
   [+] Einkauf einbuchen      → erhöht Bestand
-  [-] Verbrauch eintragen    → verringert Bestand  
+  [-] Verbrauch eintragen    → verringert Bestand
   [🍳] Gericht als gekocht  → verringert automatisch Bestand
        markieren               (Rezept-Zutaten werden abgezogen)
 ```
@@ -204,6 +216,7 @@ Sonnenblumenöl   5 Fl.      3 Fl.         +2 Fl.     🟢 OK
 ```
 
 Farb-Ampel:
+
 - 🔴 Engpass: Bestand reicht definitiv nicht — Nachkauf nötig
 - 🟠 Knapp: Bestand reicht gerade so, kein Puffer — Aufmerksamkeit empfohlen
 - 🟡 Exakt: Bestand reicht genau, kein Spielraum
@@ -212,6 +225,7 @@ Farb-Ampel:
 Tippen auf eine Zeile → Detail-Ansicht zeigt, welche Gerichte an welchem Tag diese Zutat verbrauchen.
 
 **Funktionen:**
+
 - Manuelle Buchungen: Einkauf buchen, Verbrauch buchen, Korrektur buchen
 - Wenn Gericht als „gekocht" markiert → Zutaten automatisch abbuchen
 - Vorausschauende Engpassberechnung: alle zukünftigen Speiseplan-Einträge werden simuliert
@@ -245,6 +259,7 @@ Zusammenfassung (automatisch berechnet):
 ```
 
 **Unterstützte Unverträglichkeiten & Ernährungsformen:**
+
 - Vegetarisch / Vegan
 - Glutenunverträglichkeit (Zöliakie)
 - Laktoseintoleranz
@@ -284,6 +299,7 @@ Die Claude API wird für zwei Funktionen eingesetzt, die auf derselben Infrastru
 #### 4.6.1 Rezeptvorschlag beim Anlegen (✨ Neu)
 
 **Ablauf:**
+
 1. Nutzer tippt beim Anlegen eines neuen Rezepts nur den Gerichtsnamen ein (z. B. „Ofengemüse")
 2. Nutzer klickt „✨ Rezept vorschlagen lassen"
 3. App sendet an Claude API:
@@ -339,6 +355,7 @@ würzen und gemeinsam im Ofen garen.
 #### 4.6.2 Mengenberechnung für bestehende Rezepte
 
 **Ablauf:**
+
 1. Nutzer wählt Gericht und klickt „Menge berechnen"
 2. App sendet an Claude API:
    - Rezept (Zutaten und Zubereitung)
@@ -352,6 +369,7 @@ würzen und gemeinsam im Ofen garen.
    - Hinweis auf Anpassungen (z. B. Vegetarier-Portion)
 
 **Beispiel-Output der KI:**
+
 ```
 📊 Mengenempfehlung: Käsespätzle für 81 Personen
 (60 Fleischesser · 21 Vegetarier)
@@ -429,16 +447,16 @@ Einkaufsliste
 
 **Warum PWA:** Läuft auf iPad, iPhone und Laptop gleichermaßen im Browser, kein App-Store nötig, optimiert für Touch-Bedienung auf mobilen Geräten, offline-fähig beim Einkaufen.
 
-| Schicht | Technologie | Begründung |
-|---------|-------------|------------|
-| Frontend | React + TypeScript | Komponentenbasiert, Touch-optimiert |
-| UI-Framework | shadcn/ui + Tailwind CSS | Mobile-first, responsive |
-| Backend | Node.js + Express | Einfach, gut skalierbar |
-| Datenbank | PostgreSQL | Mehrbenutzer-fähig, Echtzeit-Sync |
-| Echtzeit-Sync | WebSockets (z. B. Socket.io) | Gleichzeitige Nutzung durch mehrere Personen |
-| KI | Claude API (claude-sonnet-4-6) | Mengenberechnung, Nährwerte, Rezeptprüfung |
-| Hosting | Vercel (Frontend) + Railway/Render (Backend) | Über Internet erreichbar, kostengünstig |
-| Offline | PWA Service Worker + IndexedDB | Einkaufsliste funktioniert ohne Empfang |
+| Schicht       | Technologie                                  | Begründung                                   |
+| ------------- | -------------------------------------------- | -------------------------------------------- |
+| Frontend      | React + TypeScript                           | Komponentenbasiert, Touch-optimiert          |
+| UI-Framework  | shadcn/ui + Tailwind CSS                     | Mobile-first, responsive                     |
+| Backend       | Node.js + Express                            | Einfach, gut skalierbar                      |
+| Datenbank     | PostgreSQL                                   | Mehrbenutzer-fähig, Echtzeit-Sync            |
+| Echtzeit-Sync | WebSockets (z. B. Socket.io)                 | Gleichzeitige Nutzung durch mehrere Personen |
+| KI            | Claude API (claude-sonnet-4-6)               | Mengenberechnung, Nährwerte, Rezeptprüfung   |
+| Hosting       | Vercel (Frontend) + Railway/Render (Backend) | Über Internet erreichbar, kostengünstig      |
+| Offline       | PWA Service Worker + IndexedDB               | Einkaufsliste funktioniert ohne Empfang      |
 
 **Mobile-Optimierung:** Die gesamte UI ist primär für Touchscreen ausgelegt. Große Buttons, einfache Navigation, Einkaufsliste mit einem Fingertipp abhakbar. Desktop-Ansicht bietet zusätzlich mehr Übersicht beim Speiseplan (breitere Wochenansicht).
 
@@ -497,18 +515,23 @@ Einkaufsliste
 ## 8. Besondere Features für den Lagerbetrieb
 
 ### Standard-Mahlzeiten-Vorlagen
+
 Frühstück und Abendessen sind fast täglich identisch → einmal als Vorlage anlegen, automatisch in jeden Tag einsetzen. Gudruns heiliger Zettel wird zur App-Vorlage!
 
 ### Metro-Bestellliste Export
+
 Export der Einkaufsliste im Format, das direkt an die Metro-Ansprechpartner gesendet werden kann — vorformatiert wie die bestehenden Word-Dokumente.
 
 ### Spenden-Tracking
+
 Essensspenden (Müsli, Nutella, Kuchen, etc.) können eingebucht werden und verringern die Einkaufsliste automatisch.
 
 ### Offline-Modus
+
 Beim Einkaufen gibt es oft kein gutes Mobilfunknetz. Die App muss offline funktionieren und sich synchronisieren, sobald wieder Empfang da ist.
 
 ### Allergene & Unverträglichkeiten
+
 Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein geplantes Gericht Allergene enthält, die in der Gruppe vorkommen.
 
 ---
@@ -516,6 +539,7 @@ Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein 
 ## 9. Entwicklungs-Roadmap
 
 ### Phase 1 – MVP (2–3 Wochen)
+
 - Speiseplan-Kalender (CRUD)
 - Rezeptverwaltung: Fleisch- und Veggie-Version pro Rezept
 - Gruppenstruktur: Alter, Geschlecht, Vegetarisch, Unverträglichkeiten
@@ -523,6 +547,7 @@ Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein 
 - Benutzerauthentifizierung (Küchenchef / Köchin / Einkäufer)
 
 ### Phase 2 – Kern-Features (2 Wochen)
+
 - Automatische Einkaufslisten-Generierung (Fleisch + Veggie zusammengeführt)
 - Lager-Abbuchung wenn Gericht als „gekocht" markiert wird
 - Vorausschauende Engpasswarnung (Lager vs. Speiseplan simulieren)
@@ -531,6 +556,7 @@ Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein 
 - PDF-Export für Metro-Bestellung
 
 ### Phase 3 – Polish (1 Woche)
+
 - Offline-Modus (PWA Service Worker + IndexedDB)
 - Konflikt-Übersicht: Rezepte vs. Unverträglichkeiten im Speiseplan
 - Standardvorlagen (Frühstück/Abendessen nach Gudrun's Zettel)
@@ -538,6 +564,7 @@ Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein 
 - Kalkulations-Puffer dynamisch einstellbar (Standard: +15%)
 
 ### Phase 4 – Optional / Zukunft
+
 - Foto-Upload für Gerichte
 - Jahresvergleich (was haben wir letztes Jahr gekauft / was war zu viel?)
 - Spenden-Tracking (Essensspenden einbuchen → Einkaufsliste reduziert sich)
@@ -546,15 +573,15 @@ Jedes Rezept und jede Zutat ist mit Allergenen getaggt. Die App warnt, wenn ein 
 
 ## 10. Architekturentscheidungen (geklärt)
 
-| Thema | Entscheidung |
-|-------|-------------|
-| **Plattform** | PWA, optimiert für mobile Geräte (iPad, iPhone), voll funktionsfähig auch auf dem Laptop |
-| **Mehrere Nutzer** | Ja — Echtzeit-Sync per WebSockets, mehrere Personen können gleichzeitig arbeiten |
-| **Datenpersistenz** | Über das Internet (Cloud-Hosting), von überall erreichbar |
-| **Rezept-Import** | Bestehende Word-Dokumente werden als Vorlage importiert (einmalig beim Setup, dann manuell anpassen) |
-| **Kalkulations-Puffer** | Dynamisch einstellbar in den Einstellungen (Standard: +15%, war bisher fest ~95 Personen) |
-| **Einkaufsliste** | Fleisch- und Veggie-Mengen werden zusammengeführt (eine Position pro Zutat, Gesamtmenge) |
+| Thema                   | Entscheidung                                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Plattform**           | PWA, optimiert für mobile Geräte (iPad, iPhone), voll funktionsfähig auch auf dem Laptop             |
+| **Mehrere Nutzer**      | Ja — Echtzeit-Sync per WebSockets, mehrere Personen können gleichzeitig arbeiten                     |
+| **Datenpersistenz**     | Über das Internet (Cloud-Hosting), von überall erreichbar                                            |
+| **Rezept-Import**       | Bestehende Word-Dokumente werden als Vorlage importiert (einmalig beim Setup, dann manuell anpassen) |
+| **Kalkulations-Puffer** | Dynamisch einstellbar in den Einstellungen (Standard: +15%, war bisher fest ~95 Personen)            |
+| **Einkaufsliste**       | Fleisch- und Veggie-Mengen werden zusammengeführt (eine Position pro Zutat, Gesamtmenge)             |
 
 ---
 
-*Dokument erstellt auf Basis der vorliegenden KJG-Küchendokumente 2025 · Zuletzt aktualisiert: Mai 2026*
+_Dokument erstellt auf Basis der vorliegenden KJG-Küchendokumente 2025 · Zuletzt aktualisiert: Mai 2026_

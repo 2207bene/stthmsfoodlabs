@@ -1,41 +1,41 @@
-"use client"
+"use client";
 
-import { useState, useTransition } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { deleteGroup, updateGroup } from "../actions/groups"
+} from "@/components/ui/dialog";
+import { deleteGroup, updateGroup } from "../actions/groups";
 
 const SELECT_CLASS =
-  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
 
 type Group = {
-  id: string
-  name: string
-  count: number
-  ageRange: string
-  gender: string
-  isVegetarian: boolean
-  intolerances: string | null
-}
+  id: string;
+  name: string;
+  count: number;
+  ageRange: string;
+  gender: string;
+  isVegetarian: boolean;
+  intolerances: string | null;
+};
 
 export function GroupCard({ group }: { group: Group }) {
-  const [open, setOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const [name, setName] = useState(group.name)
-  const [count, setCount] = useState(String(group.count))
-  const [ageRange, setAgeRange] = useState(group.ageRange)
-  const [gender, setGender] = useState(group.gender)
-  const [isVegetarian, setIsVegetarian] = useState(String(group.isVegetarian))
-  const [intolerances, setIntolerances] = useState(group.intolerances ?? "")
+  const [name, setName] = useState(group.name);
+  const [count, setCount] = useState(String(group.count));
+  const [ageRange, setAgeRange] = useState(group.ageRange);
+  const [gender, setGender] = useState(group.gender);
+  const [isVegetarian, setIsVegetarian] = useState(String(group.isVegetarian));
+  const [intolerances, setIntolerances] = useState(group.intolerances ?? "");
 
   const handleSave = () => {
     startTransition(async () => {
@@ -46,16 +46,16 @@ export function GroupCard({ group }: { group: Group }) {
         gender,
         isVegetarian: isVegetarian === "true",
         intolerances,
-      })
-      setOpen(false)
-    })
-  }
+      });
+      setOpen(false);
+    });
+  };
 
   const handleDelete = () => {
     startTransition(async () => {
-      await deleteGroup(group.id)
-    })
-  }
+      await deleteGroup(group.id);
+    });
+  };
 
   return (
     <div className="flex justify-between items-center p-4 border rounded-lg">
@@ -75,7 +75,7 @@ export function GroupCard({ group }: { group: Group }) {
             {group.isVegetarian ? "Vegetarisch" : "Mit Fleisch"}
           </span>
           {group.intolerances &&
-            group.intolerances.split(",").map(intol =>
+            group.intolerances.split(",").map((intol) =>
               intol.trim() !== "" ? (
                 <span
                   key={intol}
@@ -83,7 +83,7 @@ export function GroupCard({ group }: { group: Group }) {
                 >
                   {intol.trim()}
                 </span>
-              ) : null
+              ) : null,
             )}
         </div>
       </div>
@@ -92,7 +92,12 @@ export function GroupCard({ group }: { group: Group }) {
         <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
           Bearbeiten
         </Button>
-        <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isPending}>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleDelete}
+          disabled={isPending}
+        >
           Löschen
         </Button>
       </div>
@@ -109,7 +114,7 @@ export function GroupCard({ group }: { group: Group }) {
               <Input
                 id={`edit-name-${group.id}`}
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -121,7 +126,7 @@ export function GroupCard({ group }: { group: Group }) {
                 type="number"
                 min="1"
                 value={count}
-                onChange={e => setCount(e.target.value)}
+                onChange={(e) => setCount(e.target.value)}
                 required
               />
             </div>
@@ -130,7 +135,7 @@ export function GroupCard({ group }: { group: Group }) {
               <Label>Altersgruppe</Label>
               <select
                 value={ageRange}
-                onChange={e => setAgeRange(e.target.value)}
+                onChange={(e) => setAgeRange(e.target.value)}
                 className={SELECT_CLASS}
               >
                 <option value="klein">Klein (7–12)</option>
@@ -143,7 +148,7 @@ export function GroupCard({ group }: { group: Group }) {
               <Label>Geschlecht</Label>
               <select
                 value={gender}
-                onChange={e => setGender(e.target.value)}
+                onChange={(e) => setGender(e.target.value)}
                 className={SELECT_CLASS}
               >
                 <option value="m">Männlich</option>
@@ -156,7 +161,7 @@ export function GroupCard({ group }: { group: Group }) {
               <Label>Ernährung</Label>
               <select
                 value={isVegetarian}
-                onChange={e => setIsVegetarian(e.target.value)}
+                onChange={(e) => setIsVegetarian(e.target.value)}
                 className={SELECT_CLASS}
               >
                 <option value="false">Mit Fleisch</option>
@@ -168,7 +173,7 @@ export function GroupCard({ group }: { group: Group }) {
               <Label>Unverträglichkeiten (kommasepariert)</Label>
               <Input
                 value={intolerances}
-                onChange={e => setIntolerances(e.target.value)}
+                onChange={(e) => setIntolerances(e.target.value)}
                 placeholder="z.B. glutenfrei, laktosefrei"
               />
             </div>
@@ -185,5 +190,5 @@ export function GroupCard({ group }: { group: Group }) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

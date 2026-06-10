@@ -5,6 +5,7 @@ import { de } from "date-fns/locale";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MealPlanPdfButton } from "./MealPlanPdfButton";
 
 export default async function MealPlanPage({
   searchParams,
@@ -21,7 +22,7 @@ export default async function MealPlanPage({
   const startOfCurrentWeek = startOfWeek(baseDate, { weekStartsOn: 6 });
 
   const weekDates = Array.from({ length: 7 }).map((_, i) =>
-    addDays(startOfCurrentWeek, i)
+    addDays(startOfCurrentWeek, i),
   );
 
   const prevWeekParam = subWeeks(startOfCurrentWeek, 1).toISOString();
@@ -68,6 +69,10 @@ export default async function MealPlanPage({
               <ChevronRight className="w-4 h-4" />
             </Button>
           </Link>
+          <MealPlanPdfButton
+            entries={entries}
+            weekDates={weekDates.map((d) => d.toISOString())}
+          />
         </div>
       </div>
 

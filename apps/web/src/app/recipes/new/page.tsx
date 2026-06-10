@@ -11,5 +11,11 @@ export default async function NewRecipePage() {
     getPersonGroupCounts(),
   ]);
 
-  return <NewRecipeForm groups={groups} defaultMeat={counts.meat} defaultVeggie={counts.veggie} />;
+  return (
+    <NewRecipeForm
+      groups={groups}
+      defaultMeat={counts.meat}
+      defaultVeggie={counts.veggie}
+    />
+  );
 }

@@ -13,8 +13,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Plus, Trash2, Pencil, Users, ChevronDown, ChevronUp,
-  Calculator, Drumstick, Salad, RefreshCw,
+  Plus,
+  Trash2,
+  Pencil,
+  Users,
+  ChevronDown,
+  ChevronUp,
+  Calculator,
+  Drumstick,
+  Salad,
+  RefreshCw,
 } from "lucide-react";
 import {
   addIngredientToVersion,
@@ -46,8 +54,14 @@ interface IngredientsCardProps {
 }
 
 const CATEGORIES = [
-  "Fleisch & Fisch", "Gemüse", "Obst", "Milch & Käse",
-  "Brot & Getreide", "Gewürze & Saucen", "Getränke", "Sonstiges",
+  "Fleisch & Fisch",
+  "Gemüse",
+  "Obst",
+  "Milch & Käse",
+  "Brot & Getreide",
+  "Gewürze & Saucen",
+  "Getränke",
+  "Sonstiges",
 ];
 
 function formatAmount(amount: number, unit: string): string {
@@ -121,13 +135,18 @@ export function IngredientsCard({
         amountPerPerson: amount,
         category: addCategory,
       });
-      setIngredients(prev => [
+      setIngredients((prev) => [
         ...prev,
         {
           id: `temp-${Date.now()}`,
           amountPerPerson: amount,
           unit: addUnit,
-          ingredient: { id: "", name: addName.trim(), unit: addUnit, category: addCategory },
+          ingredient: {
+            id: "",
+            name: addName.trim(),
+            unit: addUnit,
+            category: addCategory,
+          },
         },
       ]);
       setAddOpen(false);
@@ -147,10 +166,12 @@ export function IngredientsCard({
         amountPerPerson: amount,
         unit: editUnit,
       });
-      setIngredients(prev =>
-        prev.map(row =>
-          row.id === editRow.id ? { ...row, amountPerPerson: amount, unit: editUnit } : row
-        )
+      setIngredients((prev) =>
+        prev.map((row) =>
+          row.id === editRow.id
+            ? { ...row, amountPerPerson: amount, unit: editUnit }
+            : row,
+        ),
       );
       setEditOpen(false);
     });
@@ -159,14 +180,16 @@ export function IngredientsCard({
   const handleRemove = (rowId: string) => {
     startTransition(async () => {
       await removeRecipeIngredient(rowId, recipeId);
-      setIngredients(prev => prev.filter(r => r.id !== rowId));
+      setIngredients((prev) => prev.filter((r) => r.id !== rowId));
     });
   };
 
   const isVeggie = versionType === "VEGETARISCH";
-  const titleIcon = isVeggie
-    ? <Salad className="w-4 h-4 text-green-600 inline mr-1" />
-    : <Drumstick className="w-4 h-4 text-orange-500 inline mr-1" />;
+  const titleIcon = isVeggie ? (
+    <Salad className="w-4 h-4 text-green-600 inline mr-1" />
+  ) : (
+    <Drumstick className="w-4 h-4 text-orange-500 inline mr-1" />
+  );
 
   return (
     <Card>
@@ -197,7 +220,9 @@ export function IngredientsCard({
                 type="number"
                 min={0}
                 value={persons}
-                onChange={e => setPersons(Math.max(0, Number(e.target.value)))}
+                onChange={(e) =>
+                  setPersons(Math.max(0, Number(e.target.value)))
+                }
                 className="w-14 text-center rounded border border-gray-300 px-1 py-0.5 text-sm bg-white"
               />
               <span>Personen</span>
@@ -208,7 +233,9 @@ export function IngredientsCard({
                 className="ml-1 p-0.5 rounded text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
                 title="Personenzahl aus Gruppen neu laden"
               >
-                <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`w-3 h-3 ${isRefreshing ? "animate-spin" : ""}`}
+                />
               </button>
             </div>
 
@@ -219,7 +246,7 @@ export function IngredientsCard({
                 min={0}
                 max={100}
                 value={buffer}
-                onChange={e => setBuffer(Number(e.target.value))}
+                onChange={(e) => setBuffer(Number(e.target.value))}
                 className="w-12 text-center rounded border border-gray-300 px-1 py-0.5 text-sm bg-white"
               />
               <span>%</span>
@@ -239,20 +266,28 @@ export function IngredientsCard({
             >
               <Calculator className="w-3 h-3" />
               Gesamtmengen
-              {showTotals ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              {showTotals ? (
+                <ChevronUp className="w-3 h-3" />
+              ) : (
+                <ChevronDown className="w-3 h-3" />
+              )}
             </Button>
           </div>
 
           {showTotals && ingredients.length > 0 && (
             <div className="border-t border-gray-200 pt-2 space-y-1">
               <p className="text-xs font-medium text-gray-500">
-                Gesamtmengen für {totalPersons} Personen{buffer > 0 ? ` (+${buffer}% Puffer)` : ""}:
+                Gesamtmengen für {totalPersons} Personen
+                {buffer > 0 ? ` (+${buffer}% Puffer)` : ""}:
               </p>
-              {ingredients.map(ing => {
+              {ingredients.map((ing) => {
                 const total = ing.amountPerPerson * totalPersons;
                 const displayTotal = formatAmount(total, ing.unit);
                 return (
-                  <div key={ing.id} className="text-xs flex justify-between text-gray-700">
+                  <div
+                    key={ing.id}
+                    className="text-xs flex justify-between text-gray-700"
+                  >
                     <span>{ing.ingredient.name}</span>
                     <span className="font-medium">{displayTotal}</span>
                   </div>
@@ -262,17 +297,21 @@ export function IngredientsCard({
           )}
 
           {showTotals && ingredients.length === 0 && (
-            <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">Noch keine Zutaten hinterlegt.</p>
+            <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
+              Noch keine Zutaten hinterlegt.
+            </p>
           )}
         </div>
       </CardHeader>
 
       <CardContent>
         {ingredients.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">Noch keine Zutaten hinterlegt.</p>
+          <p className="text-sm text-gray-500 italic">
+            Noch keine Zutaten hinterlegt.
+          </p>
         ) : (
           <ul className="space-y-0">
-            {ingredients.map(ing => (
+            {ingredients.map((ing) => (
               <li
                 key={ing.id}
                 className="flex items-center justify-between py-2 border-b last:border-0 group"
@@ -282,11 +321,18 @@ export function IngredientsCard({
                   <span className="text-sm font-medium text-gray-700 flex flex-col items-end">
                     <span>
                       {ing.amountPerPerson} {ing.unit}
-                      <span className="text-xs text-gray-400 font-normal"> /Pers.</span>
+                      <span className="text-xs text-gray-400 font-normal">
+                        {" "}
+                        /Pers.
+                      </span>
                     </span>
                     {totalPersons > 0 && (
                       <span className="text-xs text-indigo-600 font-normal bg-indigo-50 px-1.5 py-0.5 rounded mt-0.5">
-                        Gesamt: {formatAmount(ing.amountPerPerson * totalPersons, ing.unit)}
+                        Gesamt:{" "}
+                        {formatAmount(
+                          ing.amountPerPerson * totalPersons,
+                          ing.unit,
+                        )}
                       </span>
                     )}
                   </span>
@@ -324,9 +370,9 @@ export function IngredientsCard({
               <Input
                 id="add-name"
                 value={addName}
-                onChange={e => setAddName(e.target.value)}
+                onChange={(e) => setAddName(e.target.value)}
                 placeholder="z.B. Hackfleisch"
-                onKeyDown={e => e.key === "Enter" && handleAdd()}
+                onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -338,7 +384,7 @@ export function IngredientsCard({
                   min={0}
                   step="any"
                   value={addAmount}
-                  onChange={e => setAddAmount(e.target.value)}
+                  onChange={(e) => setAddAmount(e.target.value)}
                   placeholder="z.B. 150"
                 />
               </div>
@@ -347,7 +393,7 @@ export function IngredientsCard({
                 <Input
                   id="add-unit"
                   value={addUnit}
-                  onChange={e => setAddUnit(e.target.value)}
+                  onChange={(e) => setAddUnit(e.target.value)}
                   placeholder="g / ml / Stk."
                 />
               </div>
@@ -357,16 +403,22 @@ export function IngredientsCard({
               <select
                 id="add-category"
                 value={addCategory}
-                onChange={e => setAddCategory(e.target.value)}
+                onChange={(e) => setAddCategory(e.target.value)}
                 className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
             {addError && <p className="text-xs text-red-600">{addError}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Abbrechen</Button>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              Abbrechen
+            </Button>
             <Button onClick={handleAdd} disabled={isPending}>
               {isPending ? "Speichert..." : "Hinzufügen"}
             </Button>
@@ -378,7 +430,9 @@ export function IngredientsCard({
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Zutat bearbeiten – {editRow?.ingredient.name}</DialogTitle>
+            <DialogTitle>
+              Zutat bearbeiten – {editRow?.ingredient.name}
+            </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
@@ -389,7 +443,7 @@ export function IngredientsCard({
                 min={0}
                 step="any"
                 value={editAmount}
-                onChange={e => setEditAmount(e.target.value)}
+                onChange={(e) => setEditAmount(e.target.value)}
               />
             </div>
             <div className="space-y-1">
@@ -397,12 +451,14 @@ export function IngredientsCard({
               <Input
                 id="edit-unit"
                 value={editUnit}
-                onChange={e => setEditUnit(e.target.value)}
+                onChange={(e) => setEditUnit(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Abbrechen</Button>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>
+              Abbrechen
+            </Button>
             <Button onClick={handleEdit} disabled={isPending}>
               {isPending ? "Speichert..." : "Speichern"}
             </Button>

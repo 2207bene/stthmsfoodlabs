@@ -11,7 +11,12 @@ import {
   MouseSensor,
   TouchSensor,
 } from "@dnd-kit/core";
-import { assignRecipeToMealTime, removeMealPlanEntry, moveMealPlanEntry, updateMealPlanStatus } from "@/app/actions/mealplan";
+import {
+  assignRecipeToMealTime,
+  removeMealPlanEntry,
+  moveMealPlanEntry,
+  updateMealPlanStatus,
+} from "@/app/actions/mealplan";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { BookOpen, Trash2, GripVertical } from "lucide-react";
@@ -21,6 +26,7 @@ type Recipe = {
   id: string;
   name: string;
   category: string;
+  isStandard: boolean;
 };
 
 type MealPlanEntry = {
@@ -33,11 +39,31 @@ type MealPlanEntry = {
 };
 
 const MEAL_TIMES = [
-  { id: "fruehstueck", label: "Frühstück", color: "bg-orange-100 border-orange-200 text-orange-800" },
-  { id: "mittag", label: "Mittagessen", color: "bg-green-100 border-green-200 text-green-800" },
-  { id: "nachmittag", label: "Nachmittag", color: "bg-purple-100 border-purple-200 text-purple-800" },
-  { id: "abend", label: "Abendessen", color: "bg-blue-100 border-blue-200 text-blue-800" },
-  { id: "special", label: "Special", color: "bg-yellow-100 border-yellow-200 text-yellow-800" },
+  {
+    id: "fruehstueck",
+    label: "Frühstück",
+    color: "bg-orange-100 border-orange-200 text-orange-800",
+  },
+  {
+    id: "mittag",
+    label: "Mittagessen",
+    color: "bg-green-100 border-green-200 text-green-800",
+  },
+  {
+    id: "nachmittag",
+    label: "Nachmittag",
+    color: "bg-purple-100 border-purple-200 text-purple-800",
+  },
+  {
+    id: "abend",
+    label: "Abendessen",
+    color: "bg-blue-100 border-blue-200 text-blue-800",
+  },
+  {
+    id: "special",
+    label: "Special",
+    color: "bg-yellow-100 border-yellow-200 text-yellow-800",
+  },
 ];
 
 const STATUS_OPTIONS = [
@@ -53,15 +79,18 @@ function DraggableRecipe({ recipe }: { recipe: Recipe }) {
     data: { type: "recipe", recipe },
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className="flex items-center gap-2 p-3 bg-white border rounded-md shadow-sm hover:border-gray-400 z-10 relative"
+      title={recipe.name}
     >
       <div
         {...listeners}
@@ -90,14 +119,18 @@ function DraggableCalendarEntry({
   onStatusChange: (id: string, status: string) => void;
 }) {
   const isTemp = entry.id.startsWith("temp-");
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: `entry-${entry.id}`,
-    data: { type: "entry", entry },
-    disabled: isTemp,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `entry-${entry.id}`,
+      data: { type: "entry", entry },
+      disabled: isTemp,
+    });
 
   const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, opacity: isDragging ? 0.5 : 1 }
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        opacity: isDragging ? 0.5 : 1,
+      }
     : undefined;
 
   return (
@@ -105,6 +138,7 @@ function DraggableCalendarEntry({
       ref={setNodeRef}
       style={style}
       className={`p-2 rounded-md border text-sm relative group ${color}`}
+      title={entry.recipe?.name || "Unbekanntes Rezept"}
     >
       {!isTemp && (
         <div
@@ -138,7 +172,10 @@ function DraggableCalendarEntry({
       {!isTemp && (
         <button
           onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(entry.id);
+          }}
           className="absolute top-1.5 right-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity hover:text-red-600"
         >
           <Trash2 className="w-3.5 h-3.5" />
@@ -173,7 +210,9 @@ function DroppableCell({
     <div
       ref={setNodeRef}
       className={`min-h-[80px] p-2 border rounded-md transition-colors flex flex-col gap-1 ${
-        isOver ? "bg-accent border-dashed border-accent-foreground border-2" : "bg-card"
+        isOver
+          ? "bg-accent border-dashed border-accent-foreground border-2"
+          : "bg-card"
       }`}
     >
       {entries.map((entry) => (
@@ -185,14 +224,20 @@ function DroppableCell({
           onStatusChange={onStatusChange}
         />
       ))}
-      <div className={`flex items-center justify-center text-xs text-center border-2 border-dashed rounded transition-colors ${
-        entries.length === 0
-          ? "flex-1 border-transparent text-gray-300"
+      <div
+        className={`flex items-center justify-center text-xs text-center border-2 border-dashed rounded transition-colors ${
+          entries.length === 0
+            ? "flex-1 border-transparent text-gray-300"
+            : isOver
+              ? "py-1 border-accent-foreground text-accent-foreground"
+              : "py-0.5 border-transparent text-gray-200 hover:border-gray-200 hover:text-gray-300"
+        }`}
+      >
+        {entries.length === 0
+          ? "Drop Rezept hier"
           : isOver
-          ? "py-1 border-accent-foreground text-accent-foreground"
-          : "py-0.5 border-transparent text-gray-200 hover:border-gray-200 hover:text-gray-300"
-      }`}>
-        {entries.length === 0 ? "Drop Rezept hier" : isOver ? "+ hinzufügen" : "+"}
+            ? "+ hinzufügen"
+            : "+"}
       </div>
     </div>
   );
@@ -209,6 +254,12 @@ export default function MealPlanCalendar({
 }) {
   const [entries, setEntries] = useState(initialEntries);
 
+  const visibleRecipes = recipes.filter(
+    (recipe) =>
+      recipe.isStandard ||
+      !entries.some((entry) => entry.recipeId === recipe.id),
+  );
+
   // Sync with server data after revalidatePath triggers an RSC re-render
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -221,7 +272,9 @@ export default function MealPlanCalendar({
   };
 
   const handleStatusChange = async (entryId: string, status: string) => {
-    setEntries((prev) => prev.map((e) => (e.id === entryId ? { ...e, status } : e)));
+    setEntries((prev) =>
+      prev.map((e) => (e.id === entryId ? { ...e, status } : e)),
+    );
     await updateMealPlanStatus(entryId, status);
   };
 
@@ -230,7 +283,10 @@ export default function MealPlanCalendar({
 
     if (!over || !over.id.toString().startsWith("cell-")) return;
 
-    const { date, mealTime } = over.data.current as { date: string; mealTime: string };
+    const { date, mealTime } = over.data.current as {
+      date: string;
+      mealTime: string;
+    };
 
     if (active.data.current?.type === "entry") {
       const entry = active.data.current.entry as MealPlanEntry;
@@ -240,7 +296,9 @@ export default function MealPlanCalendar({
       if (sourceDate === date && entry.mealTime === mealTime) return;
 
       setEntries((prev) =>
-        prev.map((e) => (e.id === entry.id ? { ...e, date: new Date(date), mealTime } : e))
+        prev.map((e) =>
+          e.id === entry.id ? { ...e, date: new Date(date), mealTime } : e,
+        ),
       );
       await moveMealPlanEntry(entry.id, date, mealTime);
     } else {
@@ -249,10 +307,19 @@ export default function MealPlanCalendar({
         const tempId = `temp-${Date.now()}`;
         setEntries((prev) => [
           ...prev,
-          { id: tempId, date: new Date(date), mealTime, recipeId: recipe.id, recipe, status: "geplant" },
+          {
+            id: tempId,
+            date: new Date(date),
+            mealTime,
+            recipeId: recipe.id,
+            recipe,
+            status: "geplant",
+          },
         ]);
         const realId = await assignRecipeToMealTime(recipe.id, date, mealTime);
-        setEntries((prev) => prev.map((e) => (e.id === tempId ? { ...e, id: realId } : e)));
+        setEntries((prev) =>
+          prev.map((e) => (e.id === tempId ? { ...e, id: realId } : e)),
+        );
       }
     }
   };
@@ -273,7 +340,7 @@ export default function MealPlanCalendar({
   const sensors = useSensors(mouseSensor, touchSensor);
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext id="meal-plan-calendar-dnd" sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex-1 flex gap-6 overflow-hidden">
         {/* Calendar Grid */}
         <div className="flex-1 flex flex-col overflow-auto bg-card rounded-xl border border-border shadow-sm">
@@ -283,9 +350,16 @@ export default function MealPlanCalendar({
             {weekDates.map((dateStr) => {
               const date = new Date(dateStr);
               return (
-                <div key={dateStr} className="bg-muted p-3 text-center sticky top-0 z-10">
-                  <div className="text-sm font-medium text-foreground">{format(date, "EEEE", { locale: de })}</div>
-                  <div className="text-xs text-gray-500">{format(date, "dd.MM.")}</div>
+                <div
+                  key={dateStr}
+                  className="bg-muted p-3 text-center sticky top-0 z-10"
+                >
+                  <div className="text-sm font-medium text-foreground">
+                    {format(date, "EEEE", { locale: de })}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {format(date, "dd.MM.")}
+                  </div>
                 </div>
               );
             })}
@@ -298,10 +372,15 @@ export default function MealPlanCalendar({
                 </div>
                 {weekDates.map((dateStr) => {
                   const cellEntries = entries.filter(
-                    (e) => new Date(e.date).toISOString() === dateStr && e.mealTime === mealTime.id
+                    (e) =>
+                      new Date(e.date).toISOString() === dateStr &&
+                      e.mealTime === mealTime.id,
                   );
                   return (
-                    <div key={`${dateStr}-${mealTime.id}`} className="bg-card p-2 border-t border-border">
+                    <div
+                      key={`${dateStr}-${mealTime.id}`}
+                      className="bg-card p-2 border-t border-border"
+                    >
                       <DroppableCell
                         date={dateStr}
                         mealTime={mealTime.id}
@@ -326,22 +405,28 @@ export default function MealPlanCalendar({
           </div>
           <ScrollArea className="flex-1 min-h-0">
             <div className="p-4 pb-8 space-y-4">
-              {recipes.filter(r => r.category !== "Kuchenspenden").length > 0 && (
+              {visibleRecipes.filter((r) => r.category !== "Kuchenspenden").length >
+                0 && (
                 <div className="space-y-2">
-                  {recipes.filter(r => r.category !== "Kuchenspenden").map((recipe) => (
-                    <DraggableRecipe key={recipe.id} recipe={recipe} />
-                  ))}
+                  {visibleRecipes
+                    .filter((r) => r.category !== "Kuchenspenden")
+                    .map((recipe) => (
+                      <DraggableRecipe key={recipe.id} recipe={recipe} />
+                    ))}
                 </div>
               )}
-              {recipes.filter(r => r.category === "Kuchenspenden").length > 0 && (
+              {visibleRecipes.filter((r) => r.category === "Kuchenspenden").length >
+                0 && (
                 <div>
                   <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider px-1 pb-1.5 border-b border-amber-200 mb-2">
                     🎂 Kuchenspenden
                   </div>
                   <div className="space-y-2">
-                    {recipes.filter(r => r.category === "Kuchenspenden").map((recipe) => (
-                      <DraggableRecipe key={recipe.id} recipe={recipe} />
-                    ))}
+                    {visibleRecipes
+                      .filter((r) => r.category === "Kuchenspenden")
+                      .map((recipe) => (
+                        <DraggableRecipe key={recipe.id} recipe={recipe} />
+                      ))}
                   </div>
                 </div>
               )}
